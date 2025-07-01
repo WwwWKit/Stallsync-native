@@ -105,9 +105,9 @@ export const THEMES = {
   roseGold: roseGoldTheme,
 };
 
-const tintColorLight = '#0a7ea4'; 
-const tintColorDark = '#fff';
-const tintedGold = '#E8D8B5';
+const tintColorLight = "#0a7ea4";
+const tintColorDark = "#fff";
+const tintedGold = "#E8D8B5";
 
 // 👇 change this to switch theme
 export const ActiveTheme = THEMES.roseGold;
@@ -116,32 +116,34 @@ export const Colors = {
   light: {
     primary: "#C2A76D", // gold
     badge: "#0d2014",
-    text: '#11181C', // black
-    background: '#fff',
+    text: "#11181C", // black
+    background: "#fff",
     tint: tintedGold, // blue
-    icon: '#687076',// grey
-    tabIconDefault: '#687076',
+    icon: "#687076", // grey
+    tabIconDefault: "#687076",
     tabIconSelected: tintedGold,
     border: "#C2A76D",
     textLight: "#11181C",
     placeholder: "#4f4f4f",
-    textPlaceholder: "#888"
+    textPlaceholder: "#888",
+    listBackground: "#efefef",
   },
   dark: {
-    primary: "#C2A76D", 
+    primary: "#C2A76D",
     badge: "#42cf76",
-    text: '#ECEDEE',  // light grey
-    background: '#151718', // black
+    text: "#ECEDEE", // light grey
+    background: "#151718", // black
     tint: tintedGold,
-    icon: '#9BA1A6', // grey
-    tabIconDefault: '#9BA1A6',
+    icon: "#9BA1A6", // grey
+    tabIconDefault: "#9BA1A6",
     tabIconSelected: tintedGold,
     border: "#C2A76D",
     textLight: "#EBEBEB",
     placeholder: "#4f4f4f",
-    textPlaceholder: "#888"
-  }
-};
 
+    textPlaceholder: "#888",
+    listBackground: "#efefef",
+  },
+};
 
 // #075985 IOS blue

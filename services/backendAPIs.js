@@ -25,6 +25,13 @@ export const merchantAPI = {
       return null;
     }
   },
+
+  fetchImage: (filename) => {
+    if (filename && typeof filename === "string" && filename.trim() !== "") {
+      return `http://localhost:5040/api/document/detail?document=${filename}`;
+    }
+    return '';
+  },
 };
 
 export const productAPI = {
@@ -40,19 +47,43 @@ export const productAPI = {
     }
   },
 
+ listByType: async (type) => {
+    try {
+      const res = await api.get("/psprdpar/list", {
+        params: { psprdtyp: type },
+      });
+      return res.data.message?.data  || [];
+    } catch (err) {
+      console.error("Error in filteringType:", err);
+      return [];
+    }
+  },
+
+  listByCategory: async (category) => {
+    try {
+      const res = await api.get("/psprdpar/list", {
+        params: { psprdcat: category },
+      });
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in filteringCategory:", err);
+      return [];
+    }
+  },  
+
   getProduct: async (id) => {
     try {
       const res = await api.get("/psprdpar/detail", {
         params: { id },
       });
-      return res.data.message || null;
+      return res.data.message || [];
     } catch (err) {
       console.error("Error in getProduct:", err);
       return null;
     }
   },
 
-  filterByCategoryOrType: async (cat = true, type = true) => {
+  getFilter: async (cat = true, type = true) => {
     try {
      const res = await api.get("/psprdpar/filter", {
       params: { cat, type }
@@ -63,6 +94,8 @@ export const productAPI = {
       return { categories: [], types: [] };
     }
   },
+
+  
 
   
 

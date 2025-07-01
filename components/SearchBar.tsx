@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constants/colors";
-import { useColorScheme } from "../../hooks/useColorScheme";
+import { Colors } from "../constants/colors";
+import { useColorScheme } from "../hooks/useColorScheme";
 
 type SearchBarProps = TextInputProps & {
   onSearch?: () => void;
@@ -17,8 +17,8 @@ type SearchBarProps = TextInputProps & {
 };
 export default function SearchBar({
   onSearch,
-  value,
   onChangeText,
+  value,
   ...props
 }: SearchBarProps) {
   const scheme = useColorScheme();

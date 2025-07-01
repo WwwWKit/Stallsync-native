@@ -64,5 +64,50 @@ export const createCategoryStyles = (theme = "light") => {
     selectedCategoryText: {
       color: color.white,
     },
+
+    //Listing Style
+
+    listContainer: {
+      backgroundColor: color.listBackground,
+      flex: 1
+    },
+
+    cardContainer: {
+      flexDirection: "row", padding: 10, 
+    },
+
+    cardImage: {
+       width: 100,
+      height: 100,
+      backgroundColor: color.primary,
+      borderRadius: 10,
+      marginRight:10,
+    },
+    detailContainer: {
+      flex: 1,
+      paddingVertical: 4,
+      justifyContent: "space-between",
+    },
+    nameText: {
+      fontSize: 16,
+      color: color.text,
+      fontWeight: "600",
+      textAlign: "left",
+    },
+    merchantText: {
+      fontSize: 14,
+      color: color.text,
+      textAlign: "left",
+      marginTop: 2,
+      color: color.textPlaceholder,
+    },
+
+    priceText:{
+      fontSize: 15,
+      color: color.text,
+      fontWeight: "500",
+      textAlign: "left",
+    },
+
   });
 };

@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,188 +8,92 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BBQimg from "../../assets/images/BBQ.png";
+import defaultImage from "../../assets/images/default.png";
 import { createCategoryStyles } from "../../assets/styles/category.styles";
-import GoldHeaderBackground from "../../components/ui/GoldHeaderBackground";
-import SearchBar from "../../components/ui/SearchBar";
+import { createRecommendStyles } from "../../assets/styles/home.styles";
+import GoldHeaderBackground from "../../components/GoldHeaderBackground";
+import SearchBar from "../../components/SearchBar";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { productAPI } from "../../services/backendAPIs";
-const sampleProducts = [
-  {
-    id: "1",
-    name: "Classic Burger",
-    image: BBQimg,
-  },
-  {
-    id: "2",
-    name: "Veggie Delight",
-    image: BBQimg,
-  },
-  {
-    id: "3",
-    name: "Cheese Overload",
-    image: BBQimg,
-  },
-  {
-    id: "4",
-    name: "Spicy Wings",
-    image: BBQimg,
-  },
-];
-
-const categoriesData = [
-  {
-    id: "1",
-    name: "Classic Burger",
-    image: BBQimg,
-  },
-  {
-    id: "2",
-    name: "Veggie Delight",
-    image: BBQimg,
-  },
-  {
-    id: "3",
-    name: "Cheese Overload",
-    image: BBQimg,
-  },
-  {
-    id: "4",
-    name: "Spicy Wings",
-    image: BBQimg,
-  },
-];
-
-const recommendationData = [
-  {
-    id: "1",
-    name: "Classic Burger",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "2",
-    name: "Veggie Delight",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "3",
-    name: "Cheese Overload",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "4",
-    name: "Spicy Wings",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "5",
-    name: "Classic Burger",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "6",
-    name: "Veggie Delight",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "7",
-    name: "Cheese Overload",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-  {
-    id: "8",
-    name: "Spicy Wings",
-    image: BBQimg,
-    price: "RM10.00",
-    merchant: "Masakan Malaysia",
-  },
-];
 
 // const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const CategoryScreen = () => {
   const router = useRouter();
   const scheme = useColorScheme();
   const categoryStyles = createCategoryStyles(scheme);
+  const listingStyles = createRecommendStyles(scheme);
 
-  const [categories] = useState(categoriesData);
-  const [recommendation] = useState(recommendationData);
+  //Search
   const [query, setQuery] = useState("");
-  const [products, setProducts] = useState(sampleProducts);
+  //Filter
   const [categoryFilters, setCategoryFilters] = useState([]);
-const [typeFilters, setTypeFilters] = useState([]);
+  const [typeFilters, setTypeFilters] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState("ALL");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  //Fetching Filter
+  useEffect(() => {
+    fetchFilter();
+    handleFilterSelected("ALL");
+  }, []);
 
   const onSearch = () => {
-    const filtered = sampleProducts.filter((p) =>
+    const filtered = recommendation.filter((p) =>
       p.name.toLowerCase().includes(query.toLowerCase())
     );
-    setProducts(filtered);
+    setFilteredProducts(filtered);
   };
 
-const fetchFilter = async () => {
-  const { categories, types } = await productAPI.filterByCategoryOrType(true, true);
+  const fetchFilter = async () => {
+    try {
+      const { categories, types } = await productAPI.getFilter(true, true);
 
-  const formattedCategories = categories.map((cat, idx) => ({
-    id: `cat-${idx}`,
-    name: cat.desc,   // use desc for display
-    code: cat.code,
-  }));
+      const formattedCategories = categories.map((cat, idx) => ({
+        id: `cat-${idx}`,
+        name: cat.desc,
+        code: cat.code,
+      }));
 
-  const formattedTypes = types.map((typ, idx) => ({
-    id: `typ-${idx}`,
-    name: typ.desc,
-    code: typ.code,
-  }));
+      const formattedTypes = types.map((typ, idx) => ({
+        id: `typ-${idx}`,
+        name: typ.desc,
+        code: typ.code,
+      }));
 
-  setCategoryFilters(formattedCategories); // set state for category filter list
-  setTypeFilters(formattedTypes);          // set state for type filter list
-};
-
-  const handleCategorySelect = async (category) => {
-    setSelectedCategory(category);
+      setCategoryFilters(formattedCategories);
+      setTypeFilters(formattedTypes);
+    } catch (error) {
+      console.error("Error loading filter data:", error);
+    }
   };
 
-  //  const loadCategoryData = async (category) => {
-  //   try {
-  //     const meals = await MealAPI.filterByCategory(category);
-  //     const transformedMeals = meals
-  //       .map((meal) => MealAPI.transformMealData(meal))
-  //       .filter((meal) => meal !== null);
-  //     setRecipes(transformedMeals);
-  //   } catch (error) {
-  //     console.error("Error loading category data:", error);
-  //     setRecipes([]);
-  //   }
-  // };
+  const handleFilterSelected = async (code) => {
+    setSelectedFilter(code);
 
-  
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   // await sleep(2000);
-  //   await loadData();
-  //   setRefreshing(false);
-  // };
+    try {
+      // Try filter by category first
+      const isCategory = categoryFilters.some((cat) => cat.code === code);
+      let results = [];
 
-  // useEffect(() => {
-  //   loadData();
-  // }, []);
+      if (code === "ALL") {
+        results = await productAPI.listProducts("");
+      } else if (isCategory) {
+        results = await productAPI.listByCategory(code);
+      } else {
+        results = await productAPI.listByType(code);
+      }
 
-// if (loading && !refreshing) return <LoadingSpinner message="Loading delicions recipes..." />;
+      const enriched = results.map((p) => ({
+        ...p,
+        image: productAPI.fetchImage(p.psprdimg),
+      }))
+
+      setFilteredProducts(Array.isArray(enriched) ? enriched : []);
+      // console.log("Filtered products:", enriched);
+    } catch (err) {
+      console.error("Failed to filter products:", err);
+    }
+  };
 
   return (
     <SafeAreaView style={categoryStyles.container}>
@@ -202,8 +106,26 @@ const fetchFilter = async () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={categoryStyles.categoryFilterScrollContent}
         >
-          {filters.map((filter) => {
-            const isSelected = selectedCategory === filter.name;
+          <TouchableOpacity
+            style={[
+              categoryStyles.categoryButton,
+              selectedFilter === "ALL" && categoryStyles.selectedCategory,
+            ]}
+            onPress={() => handleFilterSelected("ALL")}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                categoryStyles.categoryText,
+                selectedFilter === "ALL" && categoryStyles.selectedCategoryText,
+              ]}
+            >
+              All
+            </Text>
+          </TouchableOpacity>
+
+          {categoryFilters.map((filter) => {
+            const isSelected = selectedFilter === filter.code;
             return (
               <TouchableOpacity
                 key={filter.id}
@@ -211,18 +133,33 @@ const fetchFilter = async () => {
                   categoryStyles.categoryButton,
                   isSelected && categoryStyles.selectedCategory,
                 ]}
-                onPress={() => handleCategorySelect(category.name)}
+                onPress={() => handleFilterSelected(filter.code)}
                 activeOpacity={0.7}
               >
-                <Image
-                  source={filter.image}
+                <Text
                   style={[
-                    categoryStyles.categoryImage,
-                    isSelected && categoryStyles.selectedCategoryImage,
+                    categoryStyles.categoryText,
+                    isSelected && categoryStyles.selectedCategoryText,
                   ]}
-                  contentFit="cover"
-                  transition={300}
-                />
+                >
+                  {filter.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {typeFilters.map((filter) => {
+            const isSelected = selectedFilter === filter.code;
+            return (
+              <TouchableOpacity
+                key={filter.id}
+                style={[
+                  categoryStyles.categoryButton,
+                  isSelected && categoryStyles.selectedCategory,
+                ]}
+                onPress={() => handleFilterSelected(filter.code)}
+                activeOpacity={0.7}
+              >
                 <Text
                   style={[
                     categoryStyles.categoryText,
@@ -237,58 +174,76 @@ const fetchFilter = async () => {
         </ScrollView>
       </View>
 
+      <View style={categoryStyles.listContainer}>
+        <View
+          style={{
+            backgroundColor: "white",
+            borderRadius: 10,
+            margin: 8,
+            padding: 10,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+          }}
+        >
+          <ScrollView
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={refreshing}
+          //     onRefresh={onRefresh}
+          //     tintColor={COLORS.primary}
+          >
+            <View style={ categoryStyles.list}>
+            {filteredProducts.map((p) => (
+              <TouchableOpacity
+                key={p.psprduid}
+                onPress={() => router.push(`/product/${p.psprduid}`)}
+              >
+                {/* Row */}
+                <View style={categoryStyles.cardContainer}>
+                  {/* at left */}
+                  <Image
+                    source={p.image ? { uri: p.image } : defaultImage}
+                    style={categoryStyles.cardImage}
+                  />
+                  <View style={categoryStyles.detailContainer}>
+                    {/* at right as a column */}
+                    <View>
+                      <Text
+                        style={categoryStyles.nameText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {p.psprdnme}
+                      </Text>
+                      <Text
+                        style={categoryStyles.merchantText}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {p.psmrcuiddsc}
+                      </Text>
+                    </View>
 
-<View style={{backgroundColor: "#efefef"}}>
-      <View
-        style={{
-          backgroundColor: "white",
-          borderRadius: 10,
-          margin: 8,
-          padding: 10,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
-        }}
-      >
-        <ScrollView 
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={refreshing}
-        //     onRefresh={onRefresh}
-        //     tintColor={COLORS.primary}
-            >
-          {recommendation.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => router.push(`/product/${item.id}`)}
-            >
-              {/* Row */}
-              <View style={[{ flexDirection: "row", padding: 10 }]}>
-                {/* at left */}
-                <Image
-                  source={item.image}
-                  style={{ width: 100, height: 100 }}
-                />
-                <View style={{ flex: 1, justifyContent: "space-around" }}>
-                  {/* at right as a column */}
-                  <Text style={{ marginTop: 8, fontSize: 16 }}>
-                    {item.name}
-                  </Text>
-                  <Text style={{ marginTop: 8, fontSize: 16 }}>
-                    {item.merchant}
-                  </Text>
-                  <Text style={{ marginTop: 8, fontSize: 16 }}>
-                    {item.price}
-                  </Text>
+                    <Text
+                      style={categoryStyles.priceText}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {`RM ${parseFloat(p.psprdpri).toFixed(2)}`}
+                    </Text>
+
+                    
+                  </View>
+          
                 </View>
-              </View>
-              {recommendation.length - 1 && <View />}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+              </TouchableOpacity>
+            ))}
+            </View>
+          </ScrollView>
+        </View>
       </View>
     </SafeAreaView>
   );

@@ -8,7 +8,7 @@ import {
   View
 } from "react-native";
 import { createProfileStyles } from "../../assets/styles/profile.styles";
-import GoldHeaderBackground from "../../components/ui/GoldHeaderBackground";
+import GoldHeaderBackground from "../../components/GoldHeaderBackground";
 import { useAuth } from "../../context/AuthContext";
 import { useColorScheme } from "../../hooks/useColorScheme";
 

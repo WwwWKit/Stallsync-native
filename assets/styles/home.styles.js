@@ -102,7 +102,7 @@ export const createRecommendStyles = (theme = "light") => {
       width: cardWidth,
       height: 100,
       flexDirection: "row",
-      marginVertical: 5,
+      marginVertical: 10,
       marginLeft: 10,
     },
     image: {
@@ -117,7 +117,7 @@ export const createRecommendStyles = (theme = "light") => {
       paddingVertical: 4,
       justifyContent: "space-between",
     },
-    text: {
+    nameText: {
       fontSize: 16,
       color: color.text,
       fontWeight: "600",
@@ -130,6 +130,13 @@ export const createRecommendStyles = (theme = "light") => {
       marginTop: 2,
       color: color.textPlaceholder,
     },
+
+    priceText:{
+      fontSize: 15,
+      color: color.text,
+      fontWeight: "500",
+      textAlign: "left",
+    }
   });
 };
 
