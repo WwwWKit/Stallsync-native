@@ -19,7 +19,7 @@ export const merchantAPI = {
         params: { id },
       });
       console.log("📦 API response:", res.data);
-      return res.data.message || null;
+      return res.data.message ;
     } catch (err) {
       console.log("Error in get merchant:", err);
       return null;
@@ -76,7 +76,7 @@ export const productAPI = {
       const res = await api.get("/psprdpar/detail", {
         params: { id },
       });
-      return res.data.message || [];
+      return res.data.message ;
     } catch (err) {
       console.error("Error in getProduct:", err);
       return null;
