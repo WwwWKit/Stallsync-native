@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { cartAPI } from "../../services/backendAPIs";
 
-export default function CartOverview() {
+const CartOverview = () => {
   const router = useRouter();
   const [merchantList, setMerchantList] = useState([]);
   const [cartId, setCartId] = useState(""); // ✅ store your cartId for navigation
@@ -82,3 +82,6 @@ const styles = StyleSheet.create({
     color: "gray",
   },
 });
+
+
+export default  CartOverview;

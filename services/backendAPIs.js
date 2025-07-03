@@ -18,8 +18,7 @@ export const merchantAPI = {
       const res = await api.get("/psmrcpar/detail", {
         params: { id },
       });
-      console.log("📦 API response:", res.data);
-      return res.data.message ;
+      return res.data.message;
     } catch (err) {
       console.log("Error in get merchant:", err);
       return null;
@@ -46,7 +45,41 @@ export const productAPI = {
       return [];
     }
   },
+  listCartItems: async (cartid, merchantid) => {
+    try {
+      const res = await api.get("/psprdpar/list", {
+        params: { psmbrcar: cartid, psmrcuid: merchantid},
+      });
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in list cart items:", err);
+      return [];
+    }
+  },
+  
+  listByMerchant: async (id) => {
+    try {
+      const res = await api.get("/psprdpar/list", {
+        params: { psmrcuid: id },
+      });
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in list products by merchant:", err);
+      return [];
+    }
+  },
 
+  listByMerchantAndType: async (id, type) => {
+    try {
+      const res = await api.get("/psprdpar/list", {
+        params: { psmrcuid: id, psprdtyp: type },
+      });
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in list products by merchant and type:", err);
+      return [];
+    }
+  },
   listByType: async (type) => {
     try {
       const res = await api.get("/psprdpar/list", {
@@ -76,7 +109,7 @@ export const productAPI = {
       const res = await api.get("/psprdpar/detail", {
         params: { id },
       });
-      return res.data.message ;
+      return res.data.message;
     } catch (err) {
       console.error("Error in getProduct:", err);
       return null;
@@ -104,10 +137,10 @@ export const productAPI = {
 };
 
 export const cartAPI = {
-  viewCart: async (query) => {
+  viewCart: async (id) => {
     try {
       const res = await api.get(
-        `/psmbrcrt/list?s=${encodeURIComponent(query)}`
+        `/psmbrcrt/list`, {params: {psmrcuid: id}}
       );
       const data = await res.json();
       return data.merchant || [];
@@ -152,7 +185,6 @@ export const cartAPI = {
   listMerchant: async () => {
     try {
       const res = await api.get(`/psmbrcrt/listMerchant`);
-      console.log("📦 API response:", res);
       return res.data.message.data;
     } catch (error) {
       console.log("Error in list merchant:", error);
