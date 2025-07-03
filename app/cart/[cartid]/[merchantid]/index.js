@@ -9,7 +9,11 @@ import {
   Text,
   View,
 } from "react-native";
-import { cartAPI, merchantAPI, productAPI } from "../../../../services/backendAPIs";
+import {
+  cartAPI,
+  merchantAPI,
+  productAPI,
+} from "../../../../services/backendAPIs";
 
 const CartDetail = () => {
   const { cartid, merchantid } = useLocalSearchParams();
@@ -28,7 +32,7 @@ const CartDetail = () => {
 
   const fetchCart = async () => {
     try {
-      const res = await cartAPI.getCart(psmrcuid);
+      const res = await cartAPI.getCart(merchantid);
       console.log(res);
       setCart(res);
     } catch (error) {
@@ -36,7 +40,7 @@ const CartDetail = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const fetchMerchant = async () => {
     try {
@@ -54,10 +58,12 @@ const CartDetail = () => {
     try {
       const res = await productAPI.listCartItems(cartid, merchantid);
       console.log(res);
-      const enriched = res.map(async (item) => ({
-        ...item,
-        img: await productAPI.fetchImage(item.psprdimg),
-      }));
+      const enriched = await Promise.all(
+        res.map(async (item) => ({
+          ...item,
+          image: productAPI.fetchImage(item.psprdimg),
+        }))
+      );
 
       setCartItems(enriched);
     } catch (error) {
@@ -65,14 +71,14 @@ const CartDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
 
-    if (loading)
+  if (loading)
       return (
         <SafeAreaView style={styles.center}>
           <ActivityIndicator size="large" />
         </SafeAreaView>
       );
-  };
 
   if (!cartItems.length)
     return (
@@ -88,7 +94,7 @@ const CartDetail = () => {
         {cartItems.map((item) => (
           <View key={item.psprduid} style={styles.card}>
             <Image
-              source={{ uri: item.image }}
+              source={{ uri: item.img }}
               style={styles.productImage}
               resizeMode="cover"
             />
