@@ -5,6 +5,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -12,11 +13,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
+import { memberAPI, userAPI } from "../../services/backendAPIs";
 import { DateFormatter } from "../../utils/dateFormatter";
 
 const SignUpScreen = () => {
@@ -75,25 +77,58 @@ const SignUpScreen = () => {
       return;
     }
 
-    if (password.length < 8) {
-      alert("Password must be at least 8 characters long");
-      return;
-    }
-
-    if (isLoaded) return;
+    // if (password.length < 8) {
+    //   alert("Password must be at least 8 characters long");
+    //   return;
+    // }
 
     setLoading(true);
 
-    //  try {
-    //      await SignUpScreen.create()
+    try {
+      // 1. Create User
+      const userPayload = {
+        psusrunm: username,
+        psusrpwd: password,
+        psusrnam: name,
+        psusreml: email,
+        psusrpre: phonePre,
+        psusrphn: phone,
+        psusrrol: "MBR",
+        psusrtyp: "MBR",
+      };
+      const userRes = await userAPI.createUser(userPayload);
 
-    //  } catch (error) {
-    //      alert(error.message);
-    //  } finally {
-    //      setLoading(false);
-    //  }
+      if (userRes.error) {
+        alert("User creation failed.");
+        return; // stop here if user creation fails
+      }
+
+      // 2. Create Member
+      const memberPayload = {
+        psmbrnam: name,
+        psmbreml: email,
+        psmbrphn: phone,
+        psmbrpre: phonePre,
+        psusrnme: username,
+        psmbrdob: dob,
+      };
+      const memberRes = await memberAPI.createMember(memberPayload);
+
+      if (memberRes.error) {
+        alert("Member creation failed.");
+        return; // stop here if member creation fails
+      }
+
+      Alert.alert("Account created successfully!");
+      router.back(); // Only called if both steps succeeded
+    } catch (error) {
+      console.error(error);
+      alert("Failed to sign up. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
-
+  
   return (
     <SafeAreaView style={authStyles.container}>
       <KeyboardAvoidingView

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 import { useColorScheme } from "react-native";
 import { Colors } from "../../constants/colors";
 
@@ -75,6 +75,9 @@ export default function TabLayout() {
           ),
         }}
       />
+  
     </Tabs>
   );
 }
+
+

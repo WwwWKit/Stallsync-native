@@ -18,7 +18,7 @@ import {
 } from "../../assets/styles/home.styles";
 import GoldHeaderBackground from "../../components/GoldHeaderBackground";
 import SearchBar from "../../components/SearchBar";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../constants/AuthContext";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { merchantAPI, productAPI } from "../../services/backendAPIs";
 
@@ -335,6 +335,7 @@ const HomeScreen = () => {
           ))}
         </View>
       </ScrollView>
+
     </SafeAreaView>
   );
 };

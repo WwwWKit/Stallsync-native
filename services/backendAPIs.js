@@ -30,7 +30,7 @@ export const merchantAPI = {
     if (filename && typeof filename === "string" && filename.trim() !== "") {
       return `http://localhost:5040/api/document/detail?document=${filename}`;
     }
-    return '';
+    return "";
   },
 };
 
@@ -47,12 +47,12 @@ export const productAPI = {
     }
   },
 
- listByType: async (type) => {
+  listByType: async (type) => {
     try {
       const res = await api.get("/psprdpar/list", {
         params: { psprdtyp: type },
       });
-      return res.data.message?.data  || [];
+      return res.data.message?.data || [];
     } catch (err) {
       console.error("Error in filteringType:", err);
       return [];
@@ -69,7 +69,7 @@ export const productAPI = {
       console.error("Error in filteringCategory:", err);
       return [];
     }
-  },  
+  },
 
   getProduct: async (id) => {
     try {
@@ -85,9 +85,9 @@ export const productAPI = {
 
   getFilter: async (cat = true, type = true) => {
     try {
-     const res = await api.get("/psprdpar/filter", {
-      params: { cat, type }
-    });
+      const res = await api.get("/psprdpar/filter", {
+        params: { cat, type },
+      });
       return res.data.message || { categories: [], types: [] };
     } catch (err) {
       console.error("Error in filteringCatOrType:", err);
@@ -95,15 +95,11 @@ export const productAPI = {
     }
   },
 
-  
-
-  
-
   fetchImage: (filename) => {
     if (filename && typeof filename === "string" && filename.trim() !== "") {
       return `http://localhost:5040/api/document/detail?document=${filename}`;
     }
-    return '';
+    return "";
   },
 };
 
@@ -121,11 +117,10 @@ export const cartAPI = {
     }
   },
 
-  addCartItem: async (id) => {
+  addCartItem: async (payload) => {
     try {
-      const res = await api.post(`/psmbrcrt/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.post(`/psmbrcrt/create`, payload);
+      return res.data;
     } catch (err) {
       console.log("Error in add cart item:", err);
       return [];
@@ -150,6 +145,17 @@ export const cartAPI = {
       return data.merchant || [];
     } catch (err) {
       console.log("Error in update cart item:", err);
+      return [];
+    }
+  },
+
+  listMerchant: async () => {
+    try {
+      const res = await api.get(`/psmbrcrt/listMerchant`);
+      console.log("📦 API response:", res);
+      return res.data.message.data;
+    } catch (error) {
+      console.log("Error in list merchant:", error);
       return [];
     }
   },
@@ -299,73 +305,69 @@ export const transactionAPI = {
   },
 };
 
-// export const userAPI = {
-//     getUser: async (id) => {
-//       try {
-//         const res = await api.get(`/psusrpar/detail?id=${id}`);
-//         const data = await res.json();
-//         return data.merchant || [];
-//       } catch (err) {
-//         console.log("Error in get user:", err);
-//         return [];
-//       }
-//     },
-
-//     createUser: async (id) => {
-//       try {
-//         const res = await api.post(`/psusrpar/create?id=${id}`);
-//         const data = await res.json();
-//         return data.merchant || [];
-//       } catch (err) {
-//         console.log("Error in create user:", err);
-//         return [];
-//       }
-//     },
-
-//     deleteUser: async (id) => {
-//       try {
-//         const res = await api.post(`/psusrpar/delete?id=${id}`);
-//         const data = await res.json();
-//         return data.merchant || [];
-//       } catch (err) {
-//         console.log("Error in delete user:", err);
-//         return [];
-//       }
-//     },
-
-//     updateUser: async (id, status) => {
-//       try {
-//         const res = await api.post(`/psusrpar/update?id=${id}&status=${status}`);
-//         const data = await res.json();
-//         return data.merchant || [];
-//       } catch (err) {
-//         console.log("Error in update user:", err);
-//         return [];
-//       }
-
-//     }
-// };
-
-export const memberAPI = {
-  getMember: async (id) => {
+export const userAPI = {
+  getUser: async (id) => {
     try {
-      const res = await api.get(`/psmbrpar/detail?id=${id}`);
+      const res = await api.get(`/psusrpar/detail?id=${id}`);
       const data = await res.json();
-      return data.merchant || [];
+      return data.user || null;
     } catch (err) {
-      console.log("Error in get member:", err);
-      return [];
+      console.error("Failed to get user:", err);
+      return null;
     }
   },
 
-  createMember: async (id) => {
+  createUser: async (payload) => {
     try {
-      const res = await api.post(`/psmbrpar/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.post(`/psusrprf/signup`, payload);
+
+      return res.data;
     } catch (err) {
-      console.log("Error in create member:", err);
-      return [];
+      console.error("Failed to create user:", err);
+      return { error: true };
+    }
+  },
+
+  deleteUser: async (id) => {
+    try {
+      const res = await api.post(`/psusrpar/delete?id=${id}`);
+      return data;
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      return { error: true };
+    }
+  },
+
+  updateUser: async (id, status) => {
+    try {
+      const res = await api.post(`/psusrpar/update?id=${id}&status=${status}`);
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      return { error: true };
+    }
+  },
+};
+
+export const memberAPI = {
+  getMember: async () => {
+    try {
+      const res = await api.get(`/psmbrprf/getByUsername`);
+      return res.data.message;
+    } catch (err) {
+      console.error("Failed to get member:", err);
+      return null;
+    }
+  },
+
+  createMember: async (payload) => {
+    try {
+      const res = await api.post(`/psmbrprf/create`, payload);
+      return res.data;
+    } catch (err) {
+      console.error("Failed to create member:", err);
+      return { error: true };
     }
   },
 
@@ -373,10 +375,10 @@ export const memberAPI = {
     try {
       const res = await api.post(`/psmbrpar/delete?id=${id}`);
       const data = await res.json();
-      return data.merchant || [];
+      return data;
     } catch (err) {
-      console.log("Error in delete member:", err);
-      return [];
+      console.error("Failed to delete member:", err);
+      return { error: true };
     }
   },
 
@@ -384,10 +386,10 @@ export const memberAPI = {
     try {
       const res = await api.post(`/psmbrpar/update?id=${id}&status=${status}`);
       const data = await res.json();
-      return data.merchant || [];
+      return data;
     } catch (err) {
-      console.log("Error in update member:", err);
-      return [];
+      console.error("Failed to update member:", err);
+      return { error: true };
     }
   },
 };

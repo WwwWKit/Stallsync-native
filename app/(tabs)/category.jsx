@@ -123,7 +123,7 @@ const CategoryScreen = () => {
               All
             </Text>
           </TouchableOpacity>
-
+              
           {categoryFilters.map((filter) => {
             const isSelected = selectedFilter === filter.code;
             return (
@@ -177,6 +177,7 @@ const CategoryScreen = () => {
       <View style={categoryStyles.listContainer}>
         <View
           style={{
+            flex: 1,
             backgroundColor: "white",
             borderRadius: 10,
             margin: 8,
@@ -189,6 +190,7 @@ const CategoryScreen = () => {
           }}
         >
           <ScrollView
+          showsVerticalScrollIndicator={false}
           // refreshControl={
           //   <RefreshControl
           //     refreshing={refreshing}

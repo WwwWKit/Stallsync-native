@@ -16,7 +16,7 @@ import {
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import api from "../../constants/APIs";
 import { Colors } from "../../constants/colors";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../constants/AuthContext";
 import { useColorScheme } from "../../hooks/useColorScheme";
 const SignInScreen = () => {
   const { signIn } = useAuth();
