@@ -206,9 +206,8 @@ export const orderAPI = {
 
   getOrder: async (id) => {
     try {
-      const res = await api.get(`/psordpar/detail?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.get(`/psordpar/detail`, {params:{psorduid: id}});
+      return res.data;
     } catch (err) {
       console.log("Error in view order:", err);
       return [];

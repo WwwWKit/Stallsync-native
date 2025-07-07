@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-web";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
+import { merchantAPI, orderAPI } from "../../../services/backendAPIs";
 
 
 const OrderDetail = () => {
@@ -13,6 +14,7 @@ const OrderDetail = () => {
   const scheme = useColorScheme();
   const theme = Colors[scheme];
   const [loading, setLoading] = useState(true);
+  const [order, setOrder] = useState("");
 
 
 
@@ -38,8 +40,16 @@ const OrderDetail = () => {
 
 const fetchOrder = async () =>  {
   try {
-    const order = await orderAPI.getOrder(orderId);
-    
+    const order = await orderAPI.getOrder(orderid);
+    const enriched = order.map = (o) => ({
+      ...o,
+      img: merchantAPI.fetchImage(o.sfi)
+    })
+    isSetAccessorDeclaration(enriched);
+  } catch (err) {
+    console.log("Failed to fetch order: ", err)
+  } finally {
+    setLoading(false);
   }
 }  
 
@@ -52,3 +62,5 @@ const fetchOrder = async () =>  {
     </SafeAreaView>
   )
 }
+
+export default OrderDetail;
