@@ -20,7 +20,7 @@
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "expo": "~53.0.12",
+    "expo": "^53.0.17",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-font": "~13.3.1",

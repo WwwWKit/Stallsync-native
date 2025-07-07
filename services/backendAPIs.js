@@ -204,7 +204,7 @@ export const orderAPI = {
     }
   },
 
-  viewOrder: async (id) => {
+  getOrder: async (id) => {
     try {
       const res = await api.get(`/psordpar/detail?id=${id}`);
       const data = await res.json();

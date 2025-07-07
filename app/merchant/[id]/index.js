@@ -71,7 +71,7 @@ const MerchantPage = () => {
         ...res,
         img: merchantAPI.fetchImage(res.psmrcsfi),
       };
-      console.log("Merchant", enriched);
+
       setMerchant(enriched);
     } catch (error) {
       console.log("Failed to load merchant:", error);
@@ -83,7 +83,7 @@ const MerchantPage = () => {
   const fetchFilter = async () => {
     try {
       const allProducts = await productAPI.listByMerchant(id);
-      console.log("Product by merchant", allProducts);
+
 
       const uniqueTypes = [...new Set(allProducts.map((p) => p.psprdtyp))];
 

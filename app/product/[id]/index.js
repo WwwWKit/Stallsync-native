@@ -59,7 +59,7 @@ const ProductPage = () => {
         ...res,
         img: productAPI.fetchImage(res.psprdimg),
       };
-      console.log("enriched", enriched);
+
       setProduct(enriched);
     } catch (error) {
       console.error("Failed to load product:", error);
