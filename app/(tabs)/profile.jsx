@@ -63,13 +63,13 @@ const ProfileScreen = () => {
       <View style={profileStyles.actionRow}>
         <TouchableOpacity
           style={profileStyles.actionButton}
-          onPress={() => router.push("/(tabs)/history")}
+          onPress={() => router.push("/order")}
         >
           <Text style={profileStyles.actionText}>Order History</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={profileStyles.actionButton}
-          onPress={() => router.push("/(tabs)/vouchers")}
+          onPress={() => router.push("/reward")}
         >
           <Text style={profileStyles.actionText}>My Vouchers</Text>
         </TouchableOpacity>

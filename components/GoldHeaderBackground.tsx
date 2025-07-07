@@ -15,5 +15,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 300,
     borderBottomRightRadius: 300,
     backgroundColor: '#C2A76D',
+    zIndex: -1,
   },
 });

@@ -1,18 +1,39 @@
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import {
+  Image,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { cartAPI } from "../../services/backendAPIs";
+import defaultImage from "../../assets/images/default.png";
+import { createCartStyles } from "../../assets/styles/cart.styles";
+import { Colors } from "../../constants/colors";
+import { useColorScheme } from "../../hooks/useColorScheme";
+import { cartAPI, merchantAPI } from "../../services/backendAPIs";
 
 const CartOverview = () => {
+  const navigation = useNavigation();
   const router = useRouter();
+  const scheme = useColorScheme();
+  const theme = Colors[scheme];
+  const cartStyles = createCartStyles(scheme);
+
   const [merchantList, setMerchantList] = useState([]);
-  const [cartId, setCartId] = useState(""); // ✅ store your cartId for navigation
+  const [itemList, setItemList] = useState({});
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Cart",
+      headerShown: true,
+      headerStyle: { backgroundColor: theme.primary },
+      headerTintColor: theme.text,
+      headerTitleStyle: { fontWeight: "bold", fontSize: 25 },
+    });
+  }, [navigation]);
 
   useEffect(() => {
     fetchMerchants();
@@ -20,68 +41,86 @@ const CartOverview = () => {
 
   const fetchMerchants = async () => {
     try {
-      const results = await cartAPI.listMerchant();
-      if (results.length > 0) {
-        // ✅ get cartId from backend if attached to merchant OR from token if known
-        // You can hardcode it temporarily or extend backend to include it
-        setCartId("YOUR_CART_ID_FROM_TOKEN_OR_API"); // replace later
-      }
-      setMerchantList(results);
+      const merchants = await cartAPI.listMerchant();
+      const enriched = await Promise.all(
+        merchants.map(async (m) => ({
+          ...m,
+          img: merchantAPI.fetchImage(m.psmrcsfi),
+        }))
+      );
+
+      setMerchantList(enriched);
+
+      // Fetch cart items per merchant
+      const itemsByMerchant = {};
+      await Promise.all(
+        enriched.map(async (m) => {
+          const items = await cartAPI.listCartItems(m.psmrcuid);
+          itemsByMerchant[m.psmrcuid] = items;
+        })
+      );
+      setItemList(itemsByMerchant);
     } catch (err) {
-      console.error("Failed to fetch merchant list:", err);
+      console.error("Failed to fetch merchants or items:", err);
     }
   };
 
-  const handleMerchantPress = (cartid, merchantid) => {
-    router.push(`/cart/${cartid}/${merchantid}`);
+  const handleMerchantPress = (merchantid) => {
+    router.push(`/cart/${merchantid}`);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Your Cart by Merchant</Text>
-        {merchantList.map((merchant) => (
-          <TouchableOpacity
-            key={merchant.psmrcuid}
-            style={styles.card}
-            onPress={() =>
-              handleMerchantPress(cartId, merchant.psmrcuid) // ✅ pass both values
-            }
-          >
-            <Text style={styles.merchantName}>{merchant.psmrcnme}</Text>
-            <Text style={styles.cartId}>Merchant ID: {merchant.psmrcuid}</Text>
-          </TouchableOpacity>
-        ))}
+    <SafeAreaView style={cartStyles.container}>
+      <ScrollView contentContainerStyle={cartStyles.scrollContainer}>
+        {merchantList.length === 0 ? (
+          <View style={{ padding: 20 }}>
+            <Text style={{ textAlign: "center", fontSize: 16 }}>
+              Your cart is currently empty.
+            </Text>
+          </View>
+        ) : (
+          merchantList.map((merchant, idx) => {
+            const items = itemList[merchant.psmrcuid] || [];
+            return (
+              <View key={merchant.psmrcuid} style={cartStyles.card}>
+                <TouchableOpacity
+                  onPress={() => handleMerchantPress(merchant.psmrcuid)}
+                >
+                  <View>
+                    <View style={cartStyles.rowContainer}>
+                      <Text style={cartStyles.index}>{idx + 1}</Text>
+                      <Image
+                        source={
+                          merchant.img ? { uri: merchant.img } : defaultImage
+                        }
+                        style={cartStyles.image}
+                        resizeMode="cover"
+                      />
+                      <View>
+                        <Text style={cartStyles.name}>{merchant.psmrcnme}</Text>
+                        <Text>{items.length} item(s) in cart</Text>
+                      </View>
+                    </View>
+                    <View style={cartStyles.separator} />
+                    <View style={cartStyles.itemListContainer}>
+                      {items.slice(0, 5).map((item) => (
+                        <Text key={item.psitmcno} style={cartStyles.item}>
+                          − {item.product.psprdnme} x{item.psitmqty}
+                        </Text>
+                      ))}
+                      {items.length > 5 && (
+                        <Text style={cartStyles.andmore}>... and more</Text>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          })
+        )}
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  card: {
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    backgroundColor: "#f3f3f3",
-    elevation: 2,
-  },
-  merchantName: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  cartId: {
-    fontSize: 14,
-    color: "gray",
-  },
-});
-
-
-export default  CartOverview;
+export default CartOverview;

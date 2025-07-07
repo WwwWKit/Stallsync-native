@@ -1,6 +1,8 @@
 {
   "expo": {
     "name": "stallsync",
+    "deepLinking": true,
+    "platforms": ["ios", "android", "web"],
     "slug": "stallsync",
     "version": "1.0.0",
     "orientation": "portrait",

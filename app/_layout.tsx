@@ -8,7 +8,6 @@ import { useColorScheme } from "../hooks/useColorScheme";
 import FloatingCartButton from './../components/FloatingCartButton';
 
 
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
@@ -23,7 +22,6 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-    
       <FloatingCartButton />
       </View>
       <StatusBar style="auto" />

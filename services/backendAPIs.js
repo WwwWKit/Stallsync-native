@@ -45,18 +45,7 @@ export const productAPI = {
       return [];
     }
   },
-  listCartItems: async (cartid, merchantid) => {
-    try {
-      const res = await api.get("/psprdpar/list", {
-        params: { psmbrcar: cartid, psmrcuid: merchantid},
-      });
-      return res.data.message?.data || [];
-    } catch (err) {
-      console.error("Error in list cart items:", err);
-      return [];
-    }
-  },
-  
+
   listByMerchant: async (id) => {
     try {
       const res = await api.get("/psprdpar/list", {
@@ -139,9 +128,7 @@ export const productAPI = {
 export const cartAPI = {
   viewCart: async (id) => {
     try {
-      const res = await api.get(
-        `/psmbrcrt/list`, {params: {psmrcuid: id}}
-      );
+      const res = await api.get(`/psmbrcrt/list`, { params: { psmrcuid: id } });
       const data = await res.json();
       return data.merchant || [];
     } catch (err) {
@@ -185,9 +172,22 @@ export const cartAPI = {
   listMerchant: async () => {
     try {
       const res = await api.get(`/psmbrcrt/listMerchant`);
+      console.log("res", res);
       return res.data.message.data;
     } catch (error) {
       console.log("Error in list merchant:", error);
+      return [];
+    }
+  },
+
+  listCartItems: async (merchantid) => {
+    try {
+      const res = await api.get(`/psmbrcrt/cartItems`, {
+        params: { psmrcuid: merchantid },
+      });
+      return res.data.message || [];
+    } catch (error) {
+      console.log("Error in list cart items:", error);
       return [];
     }
   },
@@ -196,11 +196,8 @@ export const cartAPI = {
 export const orderAPI = {
   listOrders: async (query) => {
     try {
-      const res = await api.get(
-        `/psordpar/list?s=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.get("/psordpar/list");
+      return res.data.message?.data || [];
     } catch (err) {
       console.log("Error in list order:", err);
       return [];
@@ -218,11 +215,10 @@ export const orderAPI = {
     }
   },
 
-  createOrder: async (id) => {
+  createOrder: async (payload) => {
     try {
-      const res = await api.post(`/psordpar/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.post(`/psordpar/create`, payload);
+      return res.data;
     } catch (err) {
       console.log("Error in create order:", err);
       return [];
@@ -314,25 +310,30 @@ export const reviewAPI = {
 };
 
 export const transactionAPI = {
-  createTransaction: async (id) => {
+  createOffline: async (psorduid, pstrxamt) => {
     try {
-      const res = await api.post(`/pstrxpar/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in create transaction:", err);
-      return [];
+      const res = await api.post("pstrxpar/createOffline", {
+        psorduid: psorduid,
+        pstrxamt: pstrxamt,
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Failed to create offline transaction:", error);
+      return { error: true };
     }
   },
 
-  updateTransaction: async (id, status) => {
+  createOnline: async (psorduid, pstrxamt, { returnUrl }) => {
     try {
-      const res = await api.post(`/pstrxpar/update?id=${id}&status=${status}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in update transaction:", err);
-      return [];
+      const res = await api.post("pstrxpar/createOnline", {
+        psorduid: psorduid,
+        pstrxamt: pstrxamt,
+        returnUrl,
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Failed to create online transaction:", error);
+      return { error: true };
     }
   },
 };

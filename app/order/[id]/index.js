@@ -35,7 +35,7 @@ const MerchantPage = () => {
   // Set header styles
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Order History",
+      title: "Merchant Detail",
       headerShown: true,
       headerStyle: {
         backgroundColor: theme.primary,
@@ -45,7 +45,6 @@ const MerchantPage = () => {
         fontWeight: "bold", // font styling
         fontSize: 25,
       },
-      textAlign: "center",
     });
   }, [navigation]);
 
@@ -131,12 +130,13 @@ const MerchantPage = () => {
     );
   }
 
-  if (!merchant) {
+  if (!order) {
     return (
       <SafeAreaView
         style={mrcStyles.loading}
+        contentContainerStyle={mrcStyles.contentContainer}
       >
-        <Text>Merchant not found</Text>
+        <Text>Order not found</Text>
       </SafeAreaView>
     );
   }
@@ -144,101 +144,7 @@ const MerchantPage = () => {
   return (
     <SafeAreaView style={mrcStyles.container}>
       <ScrollView style={mrcStyles.ScrollContainer}>
-        <Image
-          source={merchant.img ? { uri: merchant.img } : defaultImage}
-          style={mrcStyles.image}
-          resizeMode="cover"
-        />
-
-        <Text style={mrcStyles.name}>{merchant.psmrcnme}</Text>
-
-        <View style={mrcStyles.ratingRow}>
-          <Text style={mrcStyles.rating}>
-            {`${parseFloat(merchant.psmrcrtg).toFixed(1)}`}
-          </Text>
-          <FontAwesome5 name="star" size={18} color={theme.primary} solid />
-        </View>
-
-        <View style={mrcStyles.rowContainer}>
-          {merchant.psmrclbl?.map((tag) => (
-            <View key={tag.key} style={mrcStyles.label}>
-              <Text style={{ fontSize: 12, fontWeight: "500" }}>
-                {tag.label}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        <Text style={{ fontSize: 16, marginTop: 8 }}>{merchant.psmrcdsc}</Text>
-
-        {/* Type Filters */}
-        <View style={categoryStyles.categoryFilterContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={categoryStyles.categoryFilterScrollContent}
-          >
-            {typeFilters.length > 0 &&
-              typeFilters.map((filter) => {
-                const isSelected = selectedFilter === filter.code;
-                return (
-                  <TouchableOpacity
-                    key={filter.id}
-                    style={[
-                      categoryStyles.categoryButton,
-                      isSelected && categoryStyles.selectedCategory,
-                    ]}
-                    onPress={() => handleFilterSelected(filter.code)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        categoryStyles.categoryText,
-                        isSelected && categoryStyles.selectedCategoryText,
-                      ]}
-                    >
-                      {filter.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-          </ScrollView>
-        </View>
-
-        {/* Filtered Products */}
-        <View style={{ marginTop: 16 }}>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <View
-                key={product.psprdcod}
-                style={{
-                  marginBottom: 16,
-                  backgroundColor: "#f9f9f9",
-                  padding: 10,
-                  borderRadius: 10,
-                }}
-              >
-                <Image
-                  source={{ uri: product.image }}
-                  style={{ width: "100%", height: 180, borderRadius: 10 }}
-                  resizeMode="cover"
-                />
-                <Text
-                  style={{ fontSize: 18, fontWeight: "bold", marginTop: 8 }}
-                >
-                  {product.psprdnam}
-                </Text>
-                <Text style={{ color: "#666", marginTop: 4 }}>
-                  {product.psprddsc}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={{ marginTop: 16, textAlign: "center", color: "#999" }}>
-              No products found.
-            </Text>
-          )}
-        </View>
+     
       </ScrollView>
     </SafeAreaView>
   );

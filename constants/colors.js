@@ -115,35 +115,37 @@ export const ActiveTheme = THEMES.roseGold;
 export const Colors = {
   light: {
     primary: "#C2A76D", // gold
-    badge: "#0d2014",
+    badge: "#0d2014", //black
     text: "#11181C", // black
-    background: "#fff",
-    tint: tintedGold, // blue
-    icon: "#687076", // grey
-    tabIconDefault: "#687076",
-    tabIconSelected: tintedGold,
-    border: "#C2A76D",
-    textLight: "#11181C",
-    placeholder: "#4f4f4f",
-    textPlaceholder: "#888",
-    listBackground: "#efefef",
+    background: "#fff", //white
+    tint: tintedGold, // light gold
+    icon: "#687076", // dark grey
+    tabIconDefault: "#687076",  // dark grey
+    tabIconSelected: tintedGold,  // light gold
+    border: "#C2A76D",  // gold
+    textLight: "#11181C", // black
+    placeholder: "#4f4f4f", //  grey
+    textPlaceholder: "#888",  // light grey
+    listBackground: "#efefef",  // white with grey
+    separator: "#e0e0e0", // light grey
   },
   dark: {
     primary: "#C2A76D",
-    badge: "#42cf76",
-    text: "#ECEDEE", // light grey
+    badge: "#42cf76", // green
+    text: "#ECEDEE", // white with grey
     background: "#151718", // black
-    tint: tintedGold,
+    tint: tintedGold, // light gold
     icon: "#9BA1A6", // grey
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintedGold,
-    border: "#C2A76D",
-    textLight: "#EBEBEB",
-    placeholder: "#4f4f4f",
-
-    textPlaceholder: "#888",
-    listBackground: "#efefef",
+    tabIconDefault: "#9BA1A6",  // grey
+    tabIconSelected: tintedGold,  // light gold
+    border: "#C2A76D",  // gold
+    textLight: "#EBEBEB", // white with grey
+    placeholder: "#4f4f4f", // grey
+    textPlaceholder: "#888",   // light grey
+    listBackground: "#efefef",  // white with grey
+    separator: "#e0e0e0",
   },
+
 };
 
 // #075985 IOS blue
