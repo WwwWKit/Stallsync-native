@@ -61,11 +61,11 @@ const MerchantScreen = () => {
               style={{
                 flexDirection: "row",
                 padding: 10,
-                backgroundColor: theme.background,
+                backgroundColor:theme.background,
                 borderRadius: 10,
                 marginVertical: 5,
                 marginHorizontal: 10,
-                shadowColor: "#000",
+                shadowColor: theme.shadowColor,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.25,
                 shadowRadius: 3.84,
@@ -82,15 +82,16 @@ const MerchantScreen = () => {
                   flex: 1,
                   paddingVertical: 8,
                   paddingHorizontal: 16,
+                  backgroundColor:theme.view
                 }}
               >
-                <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                <Text style={{ fontWeight: "600", fontSize: 16, color: theme.text }}>
                   {m.psmrcnme}
                 </Text>
                 <Text
                   numberOfLines={3}
                   ellipsizeMode="tail"
-                  style={{ fontSize: 16, textAlign: "justify" }}
+                  style={{ fontSize: 16, textAlign: "justify" ,color: theme.text}}
                 >
                   {typeof m.psmrcdsc === "string"
                     ? m.psmrcdsc

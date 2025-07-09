@@ -33,6 +33,7 @@ export const createCartStyles = (theme = "light") => {
       marginHorizontal: 8,
       fontWeight: "700",
       fontSize: 16,
+      color: color.text
     },
     contentContainer: {
       backgroundColor: color.background,
@@ -51,6 +52,13 @@ export const createCartStyles = (theme = "light") => {
       fontSize: 20,
       fontWeight: "600",
       marginBottom: 5,
+      color: color.text,
+      
+    },
+
+     subName: { 
+     
+      color: color.text
     },
     itemListContainer: {
       marginHorizontal: 16,
@@ -58,11 +66,13 @@ export const createCartStyles = (theme = "light") => {
     },
     item: {
       fontSize: 16,
+      color: color.text
     },
     andmore: {
       color: color.textPlaceholder,
       fontWeight: "700",
       fontSize: 14,
+      
     },
     productImage: {
       width: 100,
@@ -77,6 +87,7 @@ export const createCartStyles = (theme = "light") => {
       marginBottom: 8,
       justifyContent: "space-between",
       alignItems: "center",
+      
     },
     price: {
       fontSize: 18,
@@ -85,6 +96,7 @@ export const createCartStyles = (theme = "light") => {
       fontSize: 16,
       color: color.textPlaceholder,
       marginTop: 8,
+      
     },
     remark: {
       fontSize: 18,
@@ -101,15 +113,15 @@ export const createCartStyles = (theme = "light") => {
       fontWeight: "600",
       alignSelf: "center",
     },
-     total: {
-       fontSize: 20,
+    total: {
+      fontSize: 20,
       alignSelf: "flex-end",
       marginHorizontal: 16,
 
     },
     gtotal: {
-       fontSize: 24,
-       fontWeight: "600",
+      fontSize: 24,
+      fontWeight: "600",
       alignSelf: "flex-end",
       marginHorizontal: 16,
       marginTop: 5,

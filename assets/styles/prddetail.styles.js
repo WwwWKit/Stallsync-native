@@ -33,6 +33,7 @@ export const createProductStyles = (theme = "light") => {
       fontSize: 36,
       fontWeight: "bold",
       marginTop: 15,
+      color: color.text
     },
     merchant: {
       fontSize: 18,
@@ -42,6 +43,8 @@ export const createProductStyles = (theme = "light") => {
     label: {
       flex: 1,
       backgroundColor: color.tint,
+      color: color.text,
+
       marginVertical: 5,
       marginRight: 20,
       paddingVertical: 6,
@@ -58,6 +61,7 @@ export const createProductStyles = (theme = "light") => {
       fontSize: 28,
       fontWeight: "600",
       marginBottom: 20,
+      color: color.text
     },
     remark: {
       fontSize: 16,
@@ -65,6 +69,10 @@ export const createProductStyles = (theme = "light") => {
       paddingHorizontal: 20,
       borderRadius: 12,
       borderWidth: 1,
+      color: color.text,
+      borderWidth: 1,
+      borderColor: color.text,
+      padding: 8,
     },
 
     rowContainer: {

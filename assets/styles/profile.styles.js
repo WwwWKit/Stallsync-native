@@ -24,8 +24,9 @@ export const createProfileStyles = (theme = "light") => {
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
-      top: height * 0.28 - 150,
+      top: height * 0.28 -100,
       alignSelf: "center",
+      
     },
     image: {
       width: 180,
@@ -57,7 +58,7 @@ export const createProfileStyles = (theme = "light") => {
     },
     actionButton: {
       flex: 1,
-      backgroundColor: "#C2A76D",
+      backgroundColor: color.primary,
       paddingVertical: 30,
       borderRadius: 10,
       marginHorizontal: 6,
@@ -78,16 +79,15 @@ export const createProfileStyles = (theme = "light") => {
       paddingVertical: 14,
     },
     settingText: {
-      fontSize: 16,
-    },
-    logoutText: {
-      color: "red",
-      fontWeight: "600",
-    },
+    fontSize: 16,
+  },logoutText: {
+    color: "red",
+    fontWeight: "600",
+  },
     separator: {
-      height: 1,
-      backgroundColor: "#e0e0e0",
-      marginTop: 14,
-    },
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginTop: 14,
+  }
   });
 };

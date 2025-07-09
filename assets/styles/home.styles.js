@@ -108,14 +108,26 @@ export const createRecommendStyles = (theme = "light") => {
     image: {
       width: 100,
       height: 100,
-      backgroundColor: color.primary,
+      backgroundColor: color.background,
       borderRadius: 10,
       marginHorizontal: 10,
+      shadowColor: color.shadowColor,
+      shadowOffset: { width: 0, height: 4 }, // Push shadow downward
+      shadowOpacity: 0.2,
+      // shadowRadius: 3,
+      elevation: 4, // For Android shadow
+      backgroundColor: color.background,
     },
     detailContainer: {
       flex: 1,
       paddingVertical: 4,
       justifyContent: "space-between",
+      shadowColor: color.shadowColor,
+      shadowOffset: { width: 2, height: 4 }, // Push shadow downward
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4, // For Android shadow
+      backgroundColor: color.background,
     },
     nameText: {
       fontSize: 16,
@@ -131,7 +143,7 @@ export const createRecommendStyles = (theme = "light") => {
       color: color.textPlaceholder,
     },
 
-    priceText:{
+    priceText: {
       fontSize: 15,
       color: color.text,
       fontWeight: "500",

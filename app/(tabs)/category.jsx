@@ -176,18 +176,7 @@ const CategoryScreen = () => {
 
       <View style={categoryStyles.listContainer}>
         <View
-          style={{
-            flex: 1,
-            backgroundColor: "white",
-            borderRadius: 10,
-            margin: 8,
-            padding: 10,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-          }}
+       style={categoryStyles.listContainer}
         >
           <ScrollView
           showsVerticalScrollIndicator={false}

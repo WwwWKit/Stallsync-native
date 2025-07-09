@@ -5,12 +5,13 @@ export const createCategoryStyles = (theme = "light") => {
   const color = Colors[theme];
 
   return StyleSheet.create({
+
     container: {
       flex: 1,
       backgroundColor: color.primary,
     },
     categoryFilterContainer: {
-      
+
       paddingVertical: 16,
       backgroundColor: color.background,
     },
@@ -29,8 +30,8 @@ export const createCategoryStyles = (theme = "light") => {
       borderColor: color.border,
       minWidth: 80,
       minHeight: 80,
-      maxWidth:80,
-      maxHeight:80,
+      maxWidth: 80,
+      maxHeight: 80,
       shadowColor: color.shadow,
       shadowOffset: {
         width: 0,
@@ -74,20 +75,40 @@ export const createCategoryStyles = (theme = "light") => {
     },
 
     cardContainer: {
-      flexDirection: "row", padding: 10, 
+      flexDirection: "row", padding: 10,
+      shadowColor: color.shadowColor,
+      shadowOffset: { width: 2, height: 4 }, // Push shadow downward
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4, // For Android shadow
+      backgroundColor: color.view,
+
     },
 
     cardImage: {
-       width: 100,
+      width: 100,
       height: 100,
       backgroundColor: color.primary,
       borderRadius: 10,
-      marginRight:10,
+      marginRight: 10,
+       shadowColor: color.shadowColor,
+      shadowOffset: { width: 0, height: 4 }, // Push shadow downward
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4, // For Android shadow
+      backgroundColor: color.view,
     },
     detailContainer: {
       flex: 1,
       paddingVertical: 4,
       justifyContent: "space-between",
+      shadowColor: color.shadowColor,
+      shadowOffset: { width: 2, height: 4 }, // Push shadow downward
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4, // For Android shadow
+      backgroundColor: color.view,
+
     },
     nameText: {
       fontSize: 16,
@@ -103,7 +124,7 @@ export const createCategoryStyles = (theme = "light") => {
       color: color.textPlaceholder,
     },
 
-    priceText:{
+    priceText: {
       fontSize: 15,
       color: color.text,
       fontWeight: "500",
