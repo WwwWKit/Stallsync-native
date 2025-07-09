@@ -19,14 +19,14 @@ export const createProfileStyles = (theme = "light") => {
       paddingHorizontal: 24,
       paddingTop: 40,
     },
-    imageContainer: { 
-      height: height * 0.1 ,
+    imageContainer: {
+      height: height * 0.1,
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
-      top: height * 0.28 -100,
+      top: height * 0.28 - 100,
       alignSelf: "center",
-      
+
     },
     image: {
       width: 180,
@@ -47,7 +47,7 @@ export const createProfileStyles = (theme = "light") => {
     },
     actionButton: {
       flex: 1,
-      backgroundColor: "#C2A76D",
+      backgroundColor: color.primary,
       paddingVertical: 30,
       borderRadius: 10,
       marginHorizontal: 6,
@@ -59,23 +59,26 @@ export const createProfileStyles = (theme = "light") => {
       fontSize: 20
     },
     settingList: {
-        backgroundColor: color.background,
-        borderRadius: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-    },settingItem: {
-    paddingVertical: 14,
-  },
+      backgroundColor: color.background,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    },
+    settingItem: {
+      paddingVertical: 14,
+    },
     settingText: {
-    fontSize: 16,
-  },logoutText: {
-    color: "red",
-    fontWeight: "600",
-  },
+      color: color.text,
+      fontSize: 16,
+    },
+    logoutText: {
+      color: "red",
+      fontWeight: "600",
+    },
     separator: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-    marginTop: 14,
-  }
+      height: 1,
+      backgroundColor: "#e0e0e0",
+      marginTop: 14,
+    }
   });
 };

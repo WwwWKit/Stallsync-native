@@ -29,7 +29,7 @@ const CartOverview = () => {
     navigation.setOptions({
       title: "Cart",
       headerShown: true,
-      headerStyle: { backgroundColor: theme.primary },
+      headerStyle: { backgroundColor: theme.primary, color: theme.text },
       headerTintColor: theme.text,
       headerTitleStyle: { fontWeight: "bold", fontSize: 25 },
     });
@@ -74,7 +74,8 @@ const CartOverview = () => {
       <ScrollView contentContainerStyle={cartStyles.scrollContainer}>
         {merchantList.length === 0 ? (
           <View style={{ padding: 20 }}>
-            <Text style={{ textAlign: "center", fontSize: 16 }}>
+      
+            <Text style={{ textAlign: "center", fontSize: 16 , color: theme.text}}>
               Your cart is currently empty.
             </Text>
           </View>
@@ -98,14 +99,14 @@ const CartOverview = () => {
                       />
                       <View>
                         <Text style={cartStyles.name}>{merchant.psmrcnme}</Text>
-                        <Text>{items.length} item(s) in cart</Text>
+                        <Text style={cartStyles.subName}>{items.length} item(s) in cart</Text>
                       </View>
                     </View>
                     <View style={cartStyles.separator} />
                     <View style={cartStyles.itemListContainer}>
                       {items.slice(0, 5).map((item) => (
                         <Text key={item.psitmcno} style={cartStyles.item}>
-                          − {item.product.psprdnme} x{item.psitmqty}
+                          - {item.product.psprdnme} x{item.psitmqty}
                         </Text>
                       ))}
                       {items.length > 5 && (
