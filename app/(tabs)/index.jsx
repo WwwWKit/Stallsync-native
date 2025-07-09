@@ -32,6 +32,9 @@ const HomeScreen = () => {
   const recommendStyles = createRecommendStyles(scheme);
 
   const [allProducts, setAllProducts] = useState([]);
+  const [personalized, setPersonalized] = useState([]);
+  const [latest, setLatest] = useState([]);
+  const [trending, setTrending] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState([]);
@@ -44,6 +47,9 @@ const HomeScreen = () => {
   useEffect(() => {
     if (!isLoadingAuth) {
       fetchAllProducts();
+      fetchPersonalized();
+      fetchLatest();
+      fetchTrending();
     }
   }, [isLoadingAuth]);
 
@@ -57,6 +63,7 @@ const HomeScreen = () => {
 
     setAllProducts(enriched);
   };
+
   const fetchProducts = async (searchQuery) => {
     const results = await productAPI.listProducts(searchQuery);
 
@@ -68,9 +75,47 @@ const HomeScreen = () => {
     setProducts(enriched);
   };
 
+  const fetchPersonalized = async () => {
+    const res = await productAPI.listPersonalized();
+    console.log("Personalized products:", res);
+
+    const enriched = res.map((p) => ({
+      ...p,
+      img: productAPI.fetchImage(p.psprdimg),
+    }));
+    setPersonalized(enriched);
+  }
+
+  const fetchLatest = async () => {
+    const res = await productAPI.listLatest();
+    console.log("Latest products:", res);
+
+    const enriched = res.map((p) => ({
+      ...p,
+      img: productAPI.fetchImage(p.psprdimg),
+    }));
+    setLatest(enriched);
+  }
+
+    const fetchTrending = async () => {
+    const res = await productAPI.listTrending();
+    console.log("Trending products:", res);
+
+    const enriched = res.map((p) => ({
+      ...p,
+      img: productAPI.fetchImage(p.psprdimg),
+    }));
+    setTrending(enriched);
+  }
+
+
+
+
+
   const onSearch = () => {
     setShowDropdown(true);
   };
+
 
   const handleSearchTyping = async (text) => {
     setQuery(text);
@@ -225,7 +270,7 @@ const HomeScreen = () => {
           contentContainerStyle={{ paddingHorizontal: 16 }}
           onScrollBeginDrag={() => setShowDropdown(false)}
         >
-          {allProducts.map((p) => (
+          {latest.map((p) => (
             <View style={{ position: "relative" }}>
               <TouchableOpacity
                 key={p.psprduid}
@@ -258,7 +303,7 @@ const HomeScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={trendingStyles.scrollContent}
             >
-              {allProducts.map((p) => {
+              {trending.map((p) => {
                 return (
                   <TouchableOpacity
                     key={p.psprduid}
@@ -291,7 +336,7 @@ const HomeScreen = () => {
 
         <View style={homeStyles.sectionContainer}>
           <Text style={homeStyles.title}>Recommended For You</Text>
-          {allProducts.map((p) => (
+          {personalized.map((p) => (
             <TouchableOpacity
               key={p.psprduid}
               onPress={() => router.push(`/product/${p.psprduid}`)}

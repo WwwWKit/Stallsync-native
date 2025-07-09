@@ -106,7 +106,7 @@ const OrderOverview = () => {
                   </View>
                 </View>
                 <View style={orderStyles.statusContainer}>
-                  <Text style={orderStyles.status}>Successful</Text>
+                  <Text style={orderStyles.status}>{order.psordstsdsc}</Text>
                   <Text style={orderStyles.price}>RM{order.psordgra}</Text>
                 </View>
               </View>

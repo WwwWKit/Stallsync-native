@@ -19,25 +19,35 @@ export const createProfileStyles = (theme = "light") => {
       paddingHorizontal: 24,
       paddingTop: 40,
     },
-    imageContainer: { 
-      height: height * 0.1 ,
+    imageContainer: {
+      height: height * 0.1,
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
-      top: height * 0.28 -100,
+      top: height * 0.28 - 150,
       alignSelf: "center",
-      
     },
     image: {
       width: 180,
       height: 180,
       borderRadius: 200,
     },
+    typeContainer: {
+      backgroundColor: color.primary,
+      fontSize: 20,
+      color: color.text,
+      padding: 5,
+      borderRadius: 5,
+      marginRight: 10,
+    },
+    nameContainer: {
+      flexDirection: "row",
+      marginTop: height * 0.28,
+      justifyContent: "center",
+    },
     nameText: {
       fontSize: 28,
       color: color.text,
-      textAlign: "center",
-      marginTop: height * 0.28 + 50,
     },
     actionRow: {
       flexDirection: "row",
@@ -56,26 +66,28 @@ export const createProfileStyles = (theme = "light") => {
     actionText: {
       color: "white",
       fontWeighFt: "400",
-      fontSize: 20
+      fontSize: 20,
     },
     settingList: {
-        backgroundColor: color.background,
-        borderRadius: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-    },settingItem: {
-    paddingVertical: 14,
-  },
+      backgroundColor: color.background,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    },
+    settingItem: {
+      paddingVertical: 14,
+    },
     settingText: {
-    fontSize: 16,
-  },logoutText: {
-    color: "red",
-    fontWeight: "600",
-  },
+      fontSize: 16,
+    },
+    logoutText: {
+      color: "red",
+      fontWeight: "600",
+    },
     separator: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-    marginTop: 14,
-  }
+      height: 1,
+      backgroundColor: "#e0e0e0",
+      marginTop: 14,
+    },
   });
 };

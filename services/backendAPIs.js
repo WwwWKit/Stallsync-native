@@ -46,6 +46,36 @@ export const productAPI = {
     }
   },
 
+  listPersonalized: async () => {
+    try {
+      const res = await api.get("/psprdpar/listPersonalized");
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in listPersonalized:", err);
+      return [];
+    }
+  },
+
+   listLatest: async () => {
+    try {
+      const res = await api.get("/psprdpar/listLatest");
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in listLatest:", err);
+      return [];
+    }
+  },
+
+   listTrending: async () => {
+    try {
+      const res = await api.get("/psprdpar/listTrending");
+      return res.data.message?.data || [];
+    } catch (err) {
+      console.error("Error in listTrending:", err);
+      return [];
+    }
+  },
+
   listByMerchant: async (id) => {
     try {
       const res = await api.get("/psprdpar/list", {
@@ -206,7 +236,7 @@ export const orderAPI = {
 
   getOrder: async (id) => {
     try {
-      const res = await api.get(`/psordpar/detail`, {params:{ id }});
+      const res = await api.get(`/psordpar/detail`, { params: { id } });
       return res.data.message;
     } catch (err) {
       console.log("Error in get order:", err);
@@ -340,9 +370,8 @@ export const transactionAPI = {
 export const userAPI = {
   getUser: async (id) => {
     try {
-      const res = await api.get(`/psusrpar/detail?id=${id}`);
-      const data = await res.json();
-      return data.user || null;
+      const res = await api.get(`/psusrpar/detail`, {params: { psmbruid: id }});
+      return res.data.message;
     } catch (err) {
       console.error("Failed to get user:", err);
       return null;
@@ -383,9 +412,9 @@ export const userAPI = {
 };
 
 export const memberAPI = {
-  getMember: async () => {
+  getMember: async (id) => {
     try {
-      const res = await api.get(`/psmbrprf/getByUsername`);
+      const res = await api.get(`/psmbrprf/detailMember`);
       return res.data.message;
     } catch (err) {
       console.error("Failed to get member:", err);

@@ -1,22 +1,37 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { createProfileStyles } from "../../assets/styles/profile.styles";
 import GoldHeaderBackground from "../../components/GoldHeaderBackground";
 import { useAuth } from "../../constants/AuthContext";
 import { useColorScheme } from "../../hooks/useColorScheme";
+import { memberAPI } from "../../services/backendAPIs";
 
 const ProfileScreen = () => {
-  const {signOut } = useAuth();
+  const { signOut, isLoadingAuth } = useAuth();
   const router = useRouter();
   const scheme = useColorScheme();
   const profileStyles = createProfileStyles(scheme);
+  const [member, setMember] = useState({});
+
+  const fetchMember = async () => {
+    const member = await memberAPI.getMember();
+    console.log("User data:", member);
+    setMember(member);
+  };
+
+  useEffect(() => {
+    if (!isLoadingAuth) {
+      fetchMember();
+    }
+  }, [isLoadingAuth]);
 
   const handleSettingPress = (item) => {
     switch (item) {
@@ -49,6 +64,7 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={profileStyles.container}>
       <GoldHeaderBackground />
+      <Text>mid: {member.psmbruid}</Text>
       <TouchableOpacity
         style={profileStyles.imageContainer}
         onPress={handleChangeImage}
@@ -58,8 +74,10 @@ const ProfileScreen = () => {
           source={require("../../assets/images/default.png")}
         ></Image>
       </TouchableOpacity>
-      <Text style={profileStyles.nameText}>Username</Text>
-
+      <View style={profileStyles.nameContainer}>
+        <View style={profileStyles.typeContainer}>{member.psmbrtyp}</View>
+        <Text style={profileStyles.nameText}>{member.psmbrnam}</Text>
+      </View>
       <View style={profileStyles.actionRow}>
         <TouchableOpacity
           style={profileStyles.actionButton}
