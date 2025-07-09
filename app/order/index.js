@@ -72,7 +72,7 @@ const OrderOverview = () => {
     );
   }
 
-  if (!orders) {
+  if (!orders || orders.length === 0) {
     return (
       <SafeAreaView style={orderStyles.loading}>
         <Text>Orders not found</Text>

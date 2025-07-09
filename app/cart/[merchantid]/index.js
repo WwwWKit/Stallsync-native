@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+ import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -32,8 +32,6 @@ const CartDetail = () => {
   const cartStyles = createCartStyles(theme);
   const { merchantid } = useLocalSearchParams();
   const [cartItems, setCartItems] = useState([]);
-  const [merchant, setMerchant] = useState("");
-  const [cart, setCart] = useState("");
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [sst, setSst] = useState(0);
@@ -217,7 +215,7 @@ const CartDetail = () => {
       <View
         style={{
           position: "absolute",
-          bottom: 30,
+          bottom: 10,
           width: "100%",
           alignItems: "center",
         }}
@@ -286,7 +284,6 @@ const CartDetail = () => {
           </TouchableOpacity>
         </View>
       </Modal>
-      ;
     </SafeAreaView>
   );
 };

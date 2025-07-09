@@ -206,10 +206,10 @@ export const orderAPI = {
 
   getOrder: async (id) => {
     try {
-      const res = await api.get(`/psordpar/detail`, {params:{psorduid: id}});
-      return res.data;
+      const res = await api.get(`/psordpar/detail`, {params:{ id }});
+      return res.data.message;
     } catch (err) {
-      console.log("Error in view order:", err);
+      console.log("Error in get order:", err);
       return [];
     }
   },
