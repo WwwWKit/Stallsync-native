@@ -11,7 +11,7 @@ export const setAuthToken = (token) => {
 const api = axios.create({
   baseURL: "http://localhost:5040/api",
   //baseURL: "http://192.168.56.1:5040/api",
-  timeout: 5000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
     "api-key": "c871651f-bdf3-4795-b826-cc3cfb80075a",

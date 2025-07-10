@@ -126,11 +126,11 @@ export const Colors = {
     textLight: "#11181C", // black
     placeholder: "#4f4f4f", //  grey
     textPlaceholder: "#888",  // light grey
-    listBackground: "#efefef",  // white with grey
     separator: "#e0e0e0", // light grey
     view: "#fff",
     shadowColor: "#000",
-    listBackground:"#fff"
+    listBackground:"#fff",
+    white: "#fff",
 
   },
   dark: {
@@ -146,11 +146,11 @@ export const Colors = {
     textLight: "#EBEBEB", // white with grey
     placeholder: "#4f4f4f", // grey
     textPlaceholder: "#888",   // light grey
-    listBackground: "#efefef",  // white with grey
     separator: "#e0e0e0",
     view:"#151718",
     shadowColor: "#fff",
-    listBackground:"#1E1F21"
+    listBackground:"#1E1F21",
+    white: "#fff",
 
   },
 

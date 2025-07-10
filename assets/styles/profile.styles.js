@@ -6,6 +6,11 @@ export const createProfileStyles = (theme = "light") => {
   const color = Colors[theme];
 
   return StyleSheet.create({
+    loading: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
     container: {
       flex: 1,
       backgroundColor: color.background,
@@ -24,9 +29,8 @@ export const createProfileStyles = (theme = "light") => {
       justifyContent: "center",
       alignItems: "center",
       position: "absolute",
-      top: height * 0.28 -100,
+      top: height * 0.28 - 100,
       alignSelf: "center",
-      
     },
     image: {
       width: 180,
@@ -43,12 +47,22 @@ export const createProfileStyles = (theme = "light") => {
     },
     nameContainer: {
       flexDirection: "row",
-      marginTop: height * 0.28,
+      marginTop: height * 0.28 + 30,
       justifyContent: "center",
     },
     nameText: {
-      fontSize: 28,
+      fontSize: 30,
       color: color.text,
+    },
+    boldText: {
+      fontWeight: "bold",
+      color: color.primary,
+    },
+    point: {
+      fontSize: 18,
+      marginTop: 10,
+      color: color.text,
+      textAlign: "center",
     },
     actionRow: {
       flexDirection: "row",
@@ -79,15 +93,16 @@ export const createProfileStyles = (theme = "light") => {
       paddingVertical: 14,
     },
     settingText: {
-    fontSize: 16,
-  },logoutText: {
-    color: "red",
-    fontWeight: "600",
-  },
+      fontSize: 16,
+    },
+    logoutText: {
+      color: "red",
+      fontWeight: "600",
+    },
     separator: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-    marginTop: 14,
-  }
+      height: 1,
+      backgroundColor: "#e0e0e0",
+      marginTop: 14,
+    },
   });
 };

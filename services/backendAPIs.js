@@ -34,10 +34,10 @@ export const merchantAPI = {
 };
 
 export const productAPI = {
-  listProducts: async (query) => {
+  listProducts: async (query, params = {}) => {
     try {
       const res = await api.get("/psprdpar/list", {
-        params: { search: query },
+        params: { search: query,  limit: 50, ...params  },
       });
       return res.data.message?.data || [];
     } catch (err) {
@@ -99,10 +99,10 @@ export const productAPI = {
       return [];
     }
   },
-  listByType: async (type) => {
+  listByType: async (type, params = {}) => {
     try {
       const res = await api.get("/psprdpar/list", {
-        params: { psprdtyp: type },
+        params: { psprdtyp: type, ...params },
       });
       return res.data.message?.data || [];
     } catch (err) {
@@ -111,10 +111,10 @@ export const productAPI = {
     }
   },
 
-  listByCategory: async (category) => {
+  listByCategory: async (category, params = {}) => {
     try {
       const res = await api.get("/psprdpar/list", {
-        params: { psprdcat: category },
+        params: { psprdcat: category, ...params },
       });
       return res.data.message?.data || [];
     } catch (err) {

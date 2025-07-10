@@ -1,5 +1,5 @@
- import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
@@ -26,6 +26,7 @@ import {
 } from "../../../services/backendAPIs";
 
 const CartDetail = () => {
+  const router = useRouter();
   const navigation = useNavigation();
   const scheme = useColorScheme();
   const theme = Colors[scheme];
@@ -59,7 +60,6 @@ const CartDetail = () => {
     setSst(sst);
     setTotal(total.toFixed(2));
   };
-
 
   useEffect(() => {
     if (merchantid) {
@@ -111,49 +111,95 @@ const CartDetail = () => {
       psordpap: "N",
       psmrcuid: merchantid,
     };
-    const orderRes = await orderAPI.createOrder(orderPayload);
-    const ordId = orderRes.message.ordId;
-    // console.log("Catched ID:", ordId);
+    //   const orderRes = await orderAPI.createOrder(orderPayload);
+    //  // console.log("Order response:", orderRes);
+    //   const ordId = orderRes.message.ordId;
+    //   // console.log("Catched ID:", ordId);
 
-    if (orderRes.error) {
-      console.log("Failed to create order:", orderRes.error);
-      return;
-    }
-    return ordId;
-  };
+    //   if (orderRes.error) {
+    //     console.log("Failed to create order:", orderRes.error);
+    //     return;
+    //   }
+    //   return ordId;
+    try {
+      const orderRes = await orderAPI.createOrder(orderPayload, {
+        timeout: 15000,
+      });
 
-  const   handleOnlineCheckout = async () => {
-    const createdOrdId = await createOrder();
-    if (!createdOrdId) return;
-
-    const trxRes = await transactionAPI.createOnline(createdOrdId, total, {
-      returnUrl: getReturnUrl(),
-    });
-
-    if (trxRes?.url) {
-      const paymentUrl = trxRes.url;
-
-      if (Platform.OS === "web") {
-        setTimeout(() => {
-          console.log("Redirecting to Stripe:", paymentUrl);
-          window.location.href = paymentUrl;
-        }, 100);
-      } else {
-        const result = await WebBrowser.openAuthSessionAsync(
-          paymentUrl,
-          getReturnUrl() + "/checkout"
-        );
-
-        if (result.type === "success" && result.url.includes("success")) {
-          console.log("Payment success");
-        } else {
-          console.log("Payment cancelled");
-        }
+      if (!orderRes || !orderRes.message?.ordId) {
+        throw new Error("Order response is invalid.");
       }
-    } else {
-      Alert.alert("Stripe session not created");
+
+      return orderRes.message.ordId;
+    } catch (error) {
+      console.error("Error in create order:", error);
+      Alert.alert(
+        "Order Creation Failed",
+        "Unable to place order. Please try again later."
+      );
+      return null;
     }
   };
+
+  // const   handleOnlineCheckout = async () => {
+  //   const createdOrdId = await createOrder();
+  //   if (!createdOrdId) return;
+
+  //   const trxRes = await transactionAPI.createOnline(createdOrdId, total, {
+  //     returnUrl: getReturnUrl(),
+  //   });
+
+  //   if (trxRes?.url) {
+  //     const paymentUrl = trxRes.url;
+
+  //     if (Platform.OS === "web") {
+
+  //         console.log("Redirecting to Stripe:", paymentUrl);
+  //         window.location.href = paymentUrl;
+
+  //     } else {
+  //       const result = await WebBrowser.openAuthSessionAsync(
+  //         paymentUrl,
+  //         getReturnUrl() + "/checkout"
+  //       );
+
+  //       if (result.type === "success" && result.url.includes("success")) {
+  //         console.log("Payment success");
+  //       } else {
+  //         console.log("Payment cancelled");
+  //       }
+  //     }
+  //   } else {
+  //     Alert.alert("Stripe session not created");
+  //   }
+  // };
+  const handleOnlineCheckout = async () => {
+    setLoading(true); // show spinner
+    try {
+      const createdOrdId = await createOrder();
+      if (!createdOrdId) throw new Error("Order failed");
+
+      const trxRes = await transactionAPI.createOnline(createdOrdId, total, {
+        returnUrl: getReturnUrl(),
+      });
+      if (!trxRes?.url) throw new Error("Payment session error");
+
+      // Immediately redirect
+      const paymentUrl = trxRes.url;
+      Platform.OS === "web"
+        ? (window.location.href = paymentUrl)
+        : await WebBrowser.openAuthSessionAsync(
+            paymentUrl,
+            getReturnUrl() + "/checkout"
+          );
+    } catch (e) {
+      console.error(e);
+      Alert.alert("Checkout Error", e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOfflineCheckout = async () => {
     const createdOrdId = await createOrder();
     if (!createdOrdId) return;
@@ -195,6 +241,9 @@ const CartDetail = () => {
             <View style={cartStyles.separator} />
           </View>
         ))}
+        <TouchableOpacity onPress={ () => router.push(`/merchant/${merchantid}`) }>
+          <Text style={cartStyles.addmore}>Add More</Text>
+        </TouchableOpacity>
       </ScrollView>
       <View style={cartStyles.contentContainer}>
         <View style={cartStyles.rowContainer}>
@@ -237,6 +286,8 @@ const CartDetail = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      
       <Modal
         isVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -262,7 +313,6 @@ const CartDetail = () => {
           >
             <Text style={{ fontSize: 16 }}>Pay at Counter</Text>
           </TouchableOpacity>
-
 
           <TouchableOpacity
             style={{ paddingVertical: 12 }}

@@ -23,7 +23,7 @@ import { useColorScheme } from "../../hooks/useColorScheme";
 import { merchantAPI, productAPI } from "../../services/backendAPIs";
 
 const HomeScreen = () => {
-  const { isLoadingAuth } = useAuth();
+  const { isLoadingAuth, isLoggedIn } = useAuth();
   const router = useRouter();
   const scheme = useColorScheme();
   const homeStyles = createHomeStyles(scheme);
@@ -35,7 +35,6 @@ const HomeScreen = () => {
   const [personalized, setPersonalized] = useState([]);
   const [latest, setLatest] = useState([]);
   const [trending, setTrending] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [suggestions, setSuggestions] = useState({
@@ -77,45 +76,35 @@ const HomeScreen = () => {
 
   const fetchPersonalized = async () => {
     const res = await productAPI.listPersonalized();
-    console.log("Personalized products:", res);
-
     const enriched = res.map((p) => ({
       ...p,
       img: productAPI.fetchImage(p.psprdimg),
     }));
     setPersonalized(enriched);
-  }
+  };
 
   const fetchLatest = async () => {
     const res = await productAPI.listLatest();
-    console.log("Latest products:", res);
-
     const enriched = res.map((p) => ({
       ...p,
       img: productAPI.fetchImage(p.psprdimg),
     }));
     setLatest(enriched);
-  }
+  };
 
-    const fetchTrending = async () => {
+  const fetchTrending = async () => {
     const res = await productAPI.listTrending();
-    console.log("Trending products:", res);
-
     const enriched = res.map((p) => ({
       ...p,
       img: productAPI.fetchImage(p.psprdimg),
     }));
+    console.log("Trending products:", enriched);
     setTrending(enriched);
-  }
-
-
-
-
+  };
 
   const onSearch = () => {
     setShowDropdown(true);
   };
-
 
   const handleSearchTyping = async (text) => {
     setQuery(text);
@@ -295,48 +284,97 @@ const HomeScreen = () => {
             </View>
           ))}
         </ScrollView>
-        <View style={homeStyles.sectionContainer}>
-          <Text style={homeStyles.title}>Trending Dishes</Text>
-          <View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={trendingStyles.scrollContent}
-            >
-              {trending.map((p) => {
-                return (
-                  <TouchableOpacity
-                    key={p.psprduid}
-                    style={trendingStyles.cardContainer}
-                    onPress={() => router.push(`/product/${p.id}`)}
-                    activeOpacity={0.7}
-                  >
+        {isLoggedIn && (
+          <>
+            <View style={homeStyles.sectionContainer}>
+              <Text style={homeStyles.title}>Trending Dishes</Text>
+              <View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={trendingStyles.scrollContent}
+                >
+                  {trending.map((p) => {
+                    return (
+                      <TouchableOpacity
+                        key={p.psprduid}
+                        style={trendingStyles.cardContainer}
+                        onPress={() => router.push(`/product/${p.id}`)}
+                        activeOpacity={0.7}
+                      >
+                        <Image
+                          source={p.img ? { uri: p.img } : defaultImage}
+                          style={[trendingStyles.image]}
+                          contentFit="cover"
+                          transition={300}
+                        />
+                        <Text
+                          style={trendingStyles.nameText}
+                          numberOfLines={2}
+                          ellipsizeMode="tail"
+                        >
+                          {p.psprdnme}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </View>
+            <View style={homeStyles.sectionContainer}>
+              <View style={homeStyles.separator}></View>
+            </View>
+
+            <View style={homeStyles.sectionContainer}>
+              <Text style={homeStyles.title}>Recommended For You</Text>
+              {personalized.map((p) => (
+                <TouchableOpacity
+                  key={p.psprduid}
+                  onPress={() => router.push(`/product/${p.psprduid}`)}
+                >
+                  {/* Row */}
+                  <View style={recommendStyles.cardContainer}>
+                    {/* at left */}
                     <Image
                       source={p.img ? { uri: p.img } : defaultImage}
-                      style={[trendingStyles.image]}
-                      contentFit="cover"
-                      transition={300}
+                      style={recommendStyles.image}
                     />
-                    <Text
-                      style={trendingStyles.nameText}
-                      numberOfLines={2}
-                      ellipsizeMode="tail"
-                    >
-                      {p.psprdnme}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
-        <View style={homeStyles.sectionContainer}>
-          <View style={homeStyles.separator}></View>
-        </View>
+                    <View style={recommendStyles.detailContainer}>
+                      {/* at right as a column */}
+                      <View>
+                        <Text
+                          style={recommendStyles.nameText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {p.psprdnme}
+                        </Text>
+                        <Text
+                          style={recommendStyles.merchantText}
+                          numberOfLines={2}
+                          ellipsizeMode="tail"
+                        >
+                          {p.psmrcuiddsc}
+                        </Text>
+                      </View>
 
+                      <Text
+                        style={recommendStyles.priceText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {`RM ${parseFloat(p.psprdpri).toFixed(2)}`}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
         <View style={homeStyles.sectionContainer}>
-          <Text style={homeStyles.title}>Recommended For You</Text>
-          {personalized.map((p) => (
+          <Text style={homeStyles.title}>Other Menu</Text>
+          {allProducts.map((p) => (
             <TouchableOpacity
               key={p.psprduid}
               onPress={() => router.push(`/product/${p.psprduid}`)}
@@ -380,7 +418,6 @@ const HomeScreen = () => {
           ))}
         </View>
       </ScrollView>
-
     </SafeAreaView>
   );
 };

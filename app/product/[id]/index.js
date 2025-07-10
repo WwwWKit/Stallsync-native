@@ -5,11 +5,12 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { TextInput } from "react-native-web";
 import defaultImage from "../../../assets/images/default.png";
@@ -33,7 +34,7 @@ const ProductPage = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Product Detail",
+      title: "Product Details",
       headerShown: true,
       headerStyle: {
         backgroundColor: theme.primary,
@@ -51,6 +52,14 @@ const ProductPage = () => {
       fetchProduct();
     }
   }, [id]);
+
+  const showAlert = (message) => {
+  if (Platform.OS === "web") {
+    alert(message); // browser-native alert
+  } else {
+    Alert.alert(message);
+  }
+};
 
   const fetchProduct = async () => {
     try {
@@ -71,10 +80,10 @@ const ProductPage = () => {
   const addCart = async (cartItem) => {
     try {
       await cartAPI.addCartItem(cartItem);
-      Alert.alert("Item added to cart!");
+      showAlert("Item added to cart!");
     } catch (err) {
       console.error("Failed to add to cart:", err);
-      Alert.alert("Failed to add to cart");
+      showAlert("Failed to add to cart");
     }
   };
   if (loading) {

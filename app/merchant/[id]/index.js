@@ -1,10 +1,12 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   Text,
@@ -16,10 +18,11 @@ import { createCategoryStyles } from "../../../assets/styles/category.styles";
 import { createMrcDetailStyles } from "../../../assets/styles/mrcdetail.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { merchantAPI, productAPI } from "../../../services/backendAPIs";
+import { cartAPI, merchantAPI, productAPI } from "../../../services/backendAPIs";
 
 const MerchantPage = () => {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const navigation = useNavigation();
   const scheme = useColorScheme();
   const theme = Colors[scheme];
@@ -30,12 +33,14 @@ const MerchantPage = () => {
   const [loading, setLoading] = useState(true);
   const [typeFilters, setTypeFilters] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("");
+  const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+
 
   // Set header styles
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Order History",
+      title: "Merchant Details",
       headerShown: true,
       headerStyle: {
         backgroundColor: theme.primary,
@@ -82,20 +87,32 @@ const MerchantPage = () => {
 
   const fetchFilter = async () => {
     try {
-      const allProducts = await productAPI.listByMerchant(id);
+      const allProducts = await productAPI.listByMerchant(id); // products by merchant
 
 
-      const uniqueTypes = [...new Set(allProducts.map((p) => p.psprdtyp))];
+      const enrichedProducts = allProducts.map((p) => ({
+      ...p,
+      image: productAPI.fetchImage(p.psprdimg),
+    }));
 
-      const { types } = await productAPI.getFilter(false, true);
-      const filteredTypes = types.filter((typ) =>
-        uniqueTypes.includes(typ.code)
-      );
-      const formattedTypes = filteredTypes.map((typ, idx) => ({
+    setAllProducts(enrichedProducts);
+
+      const { types } = await productAPI.getFilter(false, true); // global types
+
+      const usedTypeCodes = [
+      ...new Set(allProducts.map((p) => p.psprdtyp).filter(Boolean)), //merchant used types
+    ];
+
+      const merchantTypes = types.filter((type) =>
+      usedTypeCodes.includes(type.code)
+    );
+
+      const formattedTypes = merchantTypes.map((typ, idx) => ({
         id: idx,
         name: typ.desc,
         code: typ.code,
       }));
+
       setTypeFilters(formattedTypes);
 
       if (formattedTypes.length > 0) {
@@ -110,16 +127,25 @@ const MerchantPage = () => {
 
   const handleFilterSelected = async (code) => {
     setSelectedFilter(code);
-    try {
-      const res = await productAPI.listByMerchantAndType(id, code);
-      const enriched = res.map((p) => ({
-        ...p,
-        image: productAPI.fetchImage(p.psprdimg),
-      }));
+    const filtered = allProducts.filter((p) => p.psprdtyp === code);
+    setFilteredProducts(filtered);
+  };
 
-      setFilteredProducts(Array.isArray(enriched) ? enriched : []);
+    const showAlert = (message) => {
+    if (Platform.OS === "web") {
+      alert(message); // browser-native alert
+    } else {
+      Alert.alert(message);
+    }
+  };
+
+  const addCart = async (cartItem) => {
+    try {
+      await cartAPI.addCartItem(cartItem);
+      showAlert("Item added to cart!");
     } catch (err) {
-      console.error("Failed to filter products:", err);
+      console.error("Failed to add to cart:", err);
+      showAlert("Failed to add to cart");
     }
   };
 
@@ -133,9 +159,7 @@ const MerchantPage = () => {
 
   if (!merchant) {
     return (
-      <SafeAreaView
-        style={mrcStyles.loading}
-      >
+      <SafeAreaView style={mrcStyles.loading}>
         <Text>Merchant not found</Text>
       </SafeAreaView>
     );
@@ -169,7 +193,9 @@ const MerchantPage = () => {
           ))}
         </View>
 
-        <Text style={{ fontSize: 16, marginTop: 8 }}>{merchant.psmrcdsc}</Text>
+        <Text style={{ fontSize: 16, marginVertical: 16 }}>
+          {merchant.psmrcdsc}
+        </Text>
 
         {/* Type Filters */}
         <View style={categoryStyles.categoryFilterContainer}>
@@ -209,29 +235,60 @@ const MerchantPage = () => {
         <View style={{ marginTop: 16 }}>
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <View
-                key={product.psprdcod}
+              <TouchableOpacity
+                key={product.psprduid}
+                onPress={() => router.push(`/product/${product.psprduid}`)}
                 style={{
                   marginBottom: 16,
                   backgroundColor: "#f9f9f9",
                   padding: 10,
                   borderRadius: 10,
+                  position: "relative", // important for absolute positioning inside
                 }}
               >
-                <Image
-                  source={{ uri: product.image }}
-                  style={{ width: "100%", height: 180, borderRadius: 10 }}
-                  resizeMode="cover"
-                />
+                <View>
+                  <Image
+                    source={{ uri: product.image }}
+                    style={{ width: "100%", height: 180, borderRadius: 10 }}
+                    resizeMode="cover"
+                  />{" "}
+                  <TouchableOpacity
+                    onPress={() =>
+                      addCart({
+                        psmrcuid: product.psmrcuid,
+                        psprduid: product.psprduid,
+                        psitmqty: 1,
+                        psitmrmk: null,
+                      })
+                    }
+                    style={{
+                      position: "absolute",
+                      bottom: 20,
+                      right: 20,
+                      backgroundColor: theme.primary,
+                      borderRadius: 30,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Ionicons
+                      name={"add"}
+                      size={20}
+                      color={theme.white}
+                      style={{ padding: 15 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
                 <Text
                   style={{ fontSize: 18, fontWeight: "bold", marginTop: 8 }}
                 >
-                  {product.psprdnam}
+                  {product.psprdnme}
                 </Text>
                 <Text style={{ color: "#666", marginTop: 4 }}>
                   {product.psprddsc}
                 </Text>
-              </View>
+              </TouchableOpacity>
             ))
           ) : (
             <Text style={{ marginTop: 16, textAlign: "center", color: "#999" }}>

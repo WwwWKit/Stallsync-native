@@ -102,6 +102,12 @@ export const createCartStyles = (theme = "light") => {
       fontSize: 18,
       color: color.textPlaceholder,
     },
+    addmore:{
+      color: color.primary,
+      fontWeight: "600",
+      fontSize: 16,
+      textAlign: "center",
+    },
 
     separator: {
       height: 1,

@@ -99,11 +99,10 @@ export const createRecommendStyles = (theme = "light") => {
 
   return StyleSheet.create({
     cardContainer: {
-      width: cardWidth,
+      paddingHorizontal: 10, 
       height: 100,
       flexDirection: "row",
       marginVertical: 10,
-      marginLeft: 10,
     },
     image: {
       width: 100,

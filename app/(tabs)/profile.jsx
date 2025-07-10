@@ -15,7 +15,7 @@ import { useColorScheme } from "../../hooks/useColorScheme";
 import { memberAPI } from "../../services/backendAPIs";
 
 const ProfileScreen = () => {
-  const { signOut, isLoadingAuth } = useAuth();
+  const { signOut, isLoadingAuth, isLoggedIn } = useAuth();
   const router = useRouter();
   const scheme = useColorScheme();
   const profileStyles = createProfileStyles(scheme);
@@ -28,20 +28,21 @@ const ProfileScreen = () => {
   };
 
   useEffect(() => {
-    if (!isLoadingAuth) {
+    if (!isLoadingAuth && isLoggedIn) {
       fetchMember();
     }
-  }, [isLoadingAuth]);
+  }, [isLoadingAuth, isLoggedIn]);
 
   const handleSettingPress = (item) => {
     switch (item) {
       case "Term & Condition":
-        router.push("/(tabs)/term");
+        router.push("/profile/term");
         break;
       case "Profile Setting":
-        router.push("/(tabs)/prfsetting");
+        router.push("/profile/${member.psmbruid}");
+
       case "Privacy Setting":
-        router.push("/(tabs)/prcsetting");
+        router.push("/profile/setting");
         break;
       case "Logout":
         handleLogout();
@@ -61,62 +62,83 @@ const ProfileScreen = () => {
     console.log("Change profile image");
   };
 
+  const isGuest = !member?.psmbruid;
+
   return (
     <SafeAreaView style={profileStyles.container}>
       <GoldHeaderBackground />
-      <Text>mid: {member.psmbruid}</Text>
-      <TouchableOpacity
-        style={profileStyles.imageContainer}
-        onPress={handleChangeImage}
-      >
-        <Image
-          style={profileStyles.image}
-          source={require("../../assets/images/default.png")}
-        ></Image>
-      </TouchableOpacity>
-      <View style={profileStyles.nameContainer}>
-        <View style={profileStyles.typeContainer}>{member.psmbrtyp}</View>
-        <Text style={profileStyles.nameText}>{member.psmbrnam}</Text>
-      </View>
-      <View style={profileStyles.actionRow}>
-        <TouchableOpacity
-          style={profileStyles.actionButton}
-          onPress={() => router.push("/order")}
-        >
-          <Text style={profileStyles.actionText}>Order History</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={profileStyles.actionButton}
-          onPress={() => router.push("/reward")}
-        >
-          <Text style={profileStyles.actionText}>My Vouchers</Text>
-        </TouchableOpacity>
-      </View>
 
-      <ScrollView style={profileStyles.settingItem}>
-        {[
-          "Profile Setting",
-          "Privacy Setting",
-          "Term & Condition",
-          "Logout",
-        ].map((item, i, arr) => (
+      {isGuest ? (
+        <>
+          <View style={profileStyles.loading}>
+            <Text style={profileStyles.nameText}>Guest User</Text>
+
+            <TouchableOpacity onPress={() => router.push("/(auth)/sign-in")}>
+              <Text style={profileStyles.nameText}>
+                <Text style={profileStyles.boldText}>Sign In </Text>
+                 to view your profile.
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : (
+        <>
+          <Text>mid: {member.psmbruid}</Text>
           <TouchableOpacity
-            key={i}
-            style={profileStyles.settingList}
-            onPress={() => handleSettingPress(item)}
+            style={profileStyles.imageContainer}
+            onPress={handleChangeImage}
           >
-            <Text
-              style={[
-                profileStyles.settingText,
-                item === "Logout" && profileStyles.logoutText,
-              ]}
-            >
-              {item}
-            </Text>
-            {i < arr.length - 1 && <View style={profileStyles.separator} />}
+            <Image
+              style={profileStyles.image}
+              source={require("../../assets/images/default.png")}
+            ></Image>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          <View style={profileStyles.nameContainer}>
+            <View style={profileStyles.typeContainer}>{member.psmbrtyp}</View>
+            <Text style={profileStyles.nameText}>{member.psmbrnam}</Text>
+          </View>
+          <Text style={profileStyles.point}>points: {member.psmbrpts}</Text>
+          <View style={profileStyles.actionRow}>
+            <TouchableOpacity
+              style={profileStyles.actionButton}
+              onPress={() => router.push("/order")}
+            >
+              <Text style={profileStyles.actionText}>Order History</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={profileStyles.actionButton}
+              onPress={() => router.push("/reward")}
+            >
+              <Text style={profileStyles.actionText}>My Vouchers</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={profileStyles.settingItem}>
+            {[
+              "Profile Setting",
+              "Privacy Setting",
+              "Term & Condition",
+              "Logout",
+            ].map((item, i, arr) => (
+              <TouchableOpacity
+                key={i}
+                style={profileStyles.settingList}
+                onPress={() => handleSettingPress(item)}
+              >
+                <Text
+                  style={[
+                    profileStyles.settingText,
+                    item === "Logout" && profileStyles.logoutText,
+                  ]}
+                >
+                  {item}
+                </Text>
+                {i < arr.length - 1 && <View style={profileStyles.separator} />}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      )}
     </SafeAreaView>
   );
 };
