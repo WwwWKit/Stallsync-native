@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
+import { showAlert } from "../../../constants/common";
 import {
   ActivityIndicator,
   Alert,
@@ -53,13 +54,7 @@ const ProductPage = () => {
     }
   }, [id]);
 
-  const showAlert = (message) => {
-  if (Platform.OS === "web") {
-    alert(message); // browser-native alert
-  } else {
-    Alert.alert(message);
-  }
-};
+
 
   const fetchProduct = async () => {
     try {

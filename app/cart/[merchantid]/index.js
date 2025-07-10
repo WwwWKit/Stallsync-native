@@ -4,7 +4,6 @@ import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Platform,
   SafeAreaView,
@@ -12,12 +11,12 @@ import {
   Text,
   TouchableOpacity,
   useColorScheme,
-  View,
+  View
 } from "react-native";
 import Modal from "react-native-modal";
 import { createCartStyles } from "../../../assets/styles/cart.styles";
 import { Colors } from "../../../constants/colors";
-import { getReturnUrl } from "../../../constants/ReturnURL";
+import { getReturnUrl, showAlert } from "../../../constants/common";
 import {
   cartAPI,
   orderAPI,
@@ -133,7 +132,7 @@ const CartDetail = () => {
       return orderRes.message.ordId;
     } catch (error) {
       console.error("Error in create order:", error);
-      Alert.alert(
+   showAlert(
         "Order Creation Failed",
         "Unable to place order. Please try again later."
       );
@@ -170,7 +169,7 @@ const CartDetail = () => {
   //       }
   //     }
   //   } else {
-  //     Alert.alert("Stripe session not created");
+  //     showAlert("Stripe session not created");
   //   }
   // };
   const handleOnlineCheckout = async () => {
@@ -194,7 +193,7 @@ const CartDetail = () => {
           );
     } catch (e) {
       console.error(e);
-      Alert.alert("Checkout Error", e.message);
+      showAlert("Checkout Error", e.message);
     } finally {
       setLoading(false);
     }
@@ -205,6 +204,7 @@ const CartDetail = () => {
     if (!createdOrdId) return;
 
     const trxRes = await transactionAPI.createOffline(createdOrdId, total);
+    router.push("/checkout/offline");
   };
 
   return (

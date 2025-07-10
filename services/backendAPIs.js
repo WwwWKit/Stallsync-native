@@ -456,11 +456,10 @@ export const memberAPI = {
 };
 
 export const rewardAPI = {
-  listReward: async () => {
+  listRewards: async () => {
     try {
       const res = await api.get(`/psrwdpar/list`);
-      const data = await res.json();
-      return data.merchant || [];
+      return res.data.message?.data || []
     } catch (err) {
       console.log("Error in list voucher:", err);
       return [];

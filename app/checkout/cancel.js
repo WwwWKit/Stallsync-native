@@ -39,7 +39,7 @@ export default function CheckoutCancel() {
         }}
       >
         <Text style={{ fontSize: 16, fontWeight: "600", color: theme.primary }}>
-          Back to Homepage
+          Back to Order Page
         </Text>
       </TouchableOpacity>
     </SafeAreaView>

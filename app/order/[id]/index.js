@@ -7,13 +7,14 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
-import Modal from "react-native-modal";
 import { createCartStyles } from "../../../assets/styles/cart.styles";
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
+import { getReturnUrl, showAlert } from "../../../constants/common";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { orderAPI } from "../../../services/backendAPIs";
+import { orderAPI, transactionAPI } from "../../../services/backendAPIs";
 
 const OrderDetail = () => {
   const { id } = useLocalSearchParams();
@@ -23,7 +24,8 @@ const OrderDetail = () => {
   const orderStyles = createOrderStyles(scheme);
   const cartStyles = createCartStyles(scheme);
   const [loading, setLoading] = useState(true);
-  const [isModalVisible, setModalVisible] = useState(false);
+
+
 
   const [order, setOrder] = useState({});
   const [orderItems, setOrderItems] = useState([]);
@@ -94,6 +96,31 @@ const OrderDetail = () => {
     setGtotal(gtotal);
   };
 
+
+  const handleOnlineCheckout = async () => {
+      setLoading(true); // show spinner
+      try {
+        const trxRes = await transactionAPI.createOnline(id, gtotal, {
+          returnUrl: getReturnUrl(),
+        });
+        if (!trxRes?.url) throw new Error("Payment session error");
+  
+        // Immediately redirect
+        const paymentUrl = trxRes.url;
+        Platform.OS === "web"
+          ? (window.location.href = paymentUrl)
+          : await WebBrowser.openAuthSessionAsync(
+              paymentUrl,
+              getReturnUrl() + "/checkout"
+            );
+      } catch (e) {
+        console.error(e);
+        showAlert("Checkout Error", e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
   return (
     <SafeAreaView style={orderStyles.container}>
       <View style={orderStyles.merchantContainer}>
@@ -156,7 +183,7 @@ const OrderDetail = () => {
               margin: 20,
               padding: 20,
             }}
-            onPress={() => setModalVisible(true)}
+            onPress={() => handleOnlineCheckout()}
           >
             <Text
               style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}
@@ -196,53 +223,6 @@ const OrderDetail = () => {
       )}
 
 
-
-       <Modal
-              isVisible={isModalVisible}
-              onBackdropPress={() => setModalVisible(false)}
-              style={{ justifyContent: "flex-end", margin: 0 }}
-            >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  padding: 20,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                }}
-              >
-                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 20 }}>
-                  Choose Payment Method
-                </Text>
-                <TouchableOpacity
-                  style={{ paddingVertical: 12 }}
-                  onPress={() => {
-                    setModalVisible(false);
-                    handleOfflineCheckout();
-                  }}
-                >
-                  <Text style={{ fontSize: 16 }}>Pay at Counter</Text>
-                </TouchableOpacity>
-      
-                <TouchableOpacity
-                  style={{ paddingVertical: 12 }}
-                  onPress={() => {
-                    setModalVisible(false);
-                    handleOnlineCheckout();
-                  }}
-                >
-                  <Text style={{ fontSize: 16 }}>Online Payment</Text>
-                </TouchableOpacity>
-      
-                <TouchableOpacity
-                  style={{ paddingVertical: 12 }}
-                  onPress={() => {
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text style={{ fontSize: 16, color: "red" }}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
     </SafeAreaView>
   );
 };

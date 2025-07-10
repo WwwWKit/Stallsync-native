@@ -19,6 +19,7 @@ import { createMrcDetailStyles } from "../../../assets/styles/mrcdetail.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import { cartAPI, merchantAPI, productAPI } from "../../../services/backendAPIs";
+import { showAlert } from "../../../constants/common";
 
 const MerchantPage = () => {
   const { id } = useLocalSearchParams();
@@ -131,13 +132,7 @@ const MerchantPage = () => {
     setFilteredProducts(filtered);
   };
 
-    const showAlert = (message) => {
-    if (Platform.OS === "web") {
-      alert(message); // browser-native alert
-    } else {
-      Alert.alert(message);
-    }
-  };
+
 
   const addCart = async (cartItem) => {
     try {

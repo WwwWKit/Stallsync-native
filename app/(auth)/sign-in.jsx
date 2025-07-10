@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { showAlert } from "../../constants/common";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -32,7 +33,7 @@ const SignInScreen = () => {
 
   const handleSignIn = async () => {
     if (!username || !password) {
-      Alert.alert("Please enter username and password.");
+      showAlert("Please enter username and password.");
       return;
     }
 
@@ -52,14 +53,14 @@ const SignInScreen = () => {
     
 
       if (!token) {
-        Alert.alert("Invalid username or password");
+        showAlert("Invalid username or password");
         return;
       }
     
       router.replace("/");
     } catch (error) {
       console.log("Login error:", error);
-      Alert.alert(
+      showAlert(
         "Login error",
         error.response?.data?.message || "An unexpected error occurred."
       );

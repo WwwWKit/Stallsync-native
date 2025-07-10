@@ -4,6 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+import { showAlert } from "../../constants/common";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -73,12 +74,12 @@ const SignUpScreen = () => {
 
   const handleSignUp = async () => {
     if (!username | !name | !email | !password | !phonePre | !phone | !dob) {
-      alert("Please fill all fields");
+      showAlert("Please fill all fields");
       return;
     }
 
     // if (password.length < 8) {
-    //   alert("Password must be at least 8 characters long");
+    //   showAlert("Password must be at least 8 characters long");
     //   return;
     // }
 
@@ -99,7 +100,7 @@ const SignUpScreen = () => {
       const userRes = await userAPI.createUser(userPayload);
 
       if (userRes.error) {
-        alert("User creation failed.");
+        showAlert("User creation failed.");
         return; // stop here if user creation fails
       }
 
@@ -115,15 +116,15 @@ const SignUpScreen = () => {
       const memberRes = await memberAPI.createMember(memberPayload);
 
       if (memberRes.error) {
-        alert("Member creation failed.");
+        showAlert("Member creation failed.");
         return; // stop here if member creation fails
       }
 
-      Alert.alert("Account created successfully!");
+      showAlert("Account created successfully!");
       router.back(); // Only called if both steps succeeded
     } catch (error) {
       console.error(error);
-      alert("Failed to sign up. Please try again.");
+      showAlert("Failed to sign up. Please try again.");
     } finally {
       setLoading(false);
     }

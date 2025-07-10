@@ -284,6 +284,7 @@ const HomeScreen = () => {
             </View>
           ))}
         </ScrollView>
+        
         {isLoggedIn && (
           <>
             <View style={homeStyles.sectionContainer}>
@@ -372,6 +373,9 @@ const HomeScreen = () => {
             </View>
           </>
         )}
+        <View style={homeStyles.sectionContainer}>
+              <View style={homeStyles.separator}></View>
+            </View>
         <View style={homeStyles.sectionContainer}>
           <Text style={homeStyles.title}>Other Menu</Text>
           {allProducts.map((p) => (
