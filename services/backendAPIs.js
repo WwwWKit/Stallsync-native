@@ -295,20 +295,18 @@ export const reviewAPI = {
 
   getReview: async (id) => {
     try {
-      const res = await api.get(`/psordrvw/detail?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.get(`/psordrvw/detail`, { params: { id } });
+      return res.data.message || null;
     } catch (err) {
       console.log("Error in get review:", err);
-      return [];
+      return null;
     }
   },
 
-  createReview: async (id) => {
+  createReview: async (payload) => {
     try {
-      const res = await api.post(`/psordrvw/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.post(`/psordrvw/create`, payload);
+      return res.data;
     } catch (err) {
       console.log("Error in create review:", err);
       return [];
@@ -488,25 +486,16 @@ export const rewardAPI = {
     }
   },
 
-  deleteReward: async (id) => {
-    try {
-      const res = await api.post(`/psvchrpar/delete?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in delete voucher:", err);
-      return [];
-    }
-  },
+};
 
-  updateReward: async (id, status) => {
+export const uploadAPI = {
+  upload: async (formData) => {
     try {
-      const res = await api.post(`/psvchrpar/update?id=${id}&status=${status}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.post("/upload", formData);
+      return res.data?.message; // or res.data depending on your backend response shape
     } catch (err) {
-      console.log("Error in update voucher:", err);
-      return [];
+      console.log("Upload error:", err);
+      return null;
     }
   },
 };

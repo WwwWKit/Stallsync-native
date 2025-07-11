@@ -2,19 +2,23 @@ import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from "react-native";
 import { createCartStyles } from "../../../assets/styles/cart.styles";
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
 import { getReturnUrl, showAlert } from "../../../constants/common";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { orderAPI, transactionAPI } from "../../../services/backendAPIs";
+import {
+  orderAPI,
+  reviewAPI,
+  transactionAPI,
+} from "../../../services/backendAPIs";
 
 const OrderDetail = () => {
   const { id } = useLocalSearchParams();
@@ -24,8 +28,6 @@ const OrderDetail = () => {
   const orderStyles = createOrderStyles(scheme);
   const cartStyles = createCartStyles(scheme);
   const [loading, setLoading] = useState(true);
-
-
 
   const [order, setOrder] = useState({});
   const [orderItems, setOrderItems] = useState([]);
@@ -47,8 +49,6 @@ const OrderDetail = () => {
     });
   }, [navigation]);
 
-
-  
   const fetchOrder = async (orderid) => {
     try {
       const order = await orderAPI.getOrder(orderid);
@@ -65,7 +65,6 @@ const OrderDetail = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     console.log("OrderDetail id:", id);
@@ -96,30 +95,44 @@ const OrderDetail = () => {
     setGtotal(gtotal);
   };
 
+  const fetchReview = async () => {
+    try {
+      const res = await reviewAPI.getReview(id);
+      console.log("Review response:", res);
+      if (res === null) {
+        router.push(`/review/create/${id}`);
+      } else {
+        router.push(`/review/${id}`);
+      }
+      
+    } catch (e) {
+      console.log("Failed to find review:", e);
+    }
+  };
 
   const handleOnlineCheckout = async () => {
-      setLoading(true); // show spinner
-      try {
-        const trxRes = await transactionAPI.createOnline(id, gtotal, {
-          returnUrl: getReturnUrl(),
-        });
-        if (!trxRes?.url) throw new Error("Payment session error");
-  
-        // Immediately redirect
-        const paymentUrl = trxRes.url;
-        Platform.OS === "web"
-          ? (window.location.href = paymentUrl)
-          : await WebBrowser.openAuthSessionAsync(
-              paymentUrl,
-              getReturnUrl() + "/checkout"
-            );
-      } catch (e) {
-        console.error(e);
-        showAlert("Checkout Error", e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true); // show spinner
+    try {
+      const trxRes = await transactionAPI.createOnline(id, gtotal, {
+        returnUrl: getReturnUrl(),
+      });
+      if (!trxRes?.url) throw new Error("Payment session error");
+
+      // Immediately redirect
+      const paymentUrl = trxRes.url;
+      Platform.OS === "web"
+        ? (window.location.href = paymentUrl)
+        : await WebBrowser.openAuthSessionAsync(
+            paymentUrl,
+            getReturnUrl() + "/checkout"
+          );
+    } catch (e) {
+      console.error(e);
+      showAlert("Checkout Error", e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={orderStyles.container}>
@@ -183,12 +196,40 @@ const OrderDetail = () => {
               margin: 20,
               padding: 20,
             }}
-            onPress={() => handleOnlineCheckout()}
+            onPress={handleOnlineCheckout}
           >
             <Text
               style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}
             >
               Continue Payment
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : order.psordsts === "D" ? (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 10,
+            width: "100%",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              width: "95%",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: theme.primary,
+              borderRadius: 100,
+              margin: 20,
+              padding: 20,
+            }}
+            onPress={fetchReview}
+          >
+            <Text
+              style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}
+            >
+              Review
             </Text>
           </TouchableOpacity>
         </View>
@@ -201,7 +242,7 @@ const OrderDetail = () => {
             alignItems: "center",
           }}
         >
-         <TouchableOpacity
+          <TouchableOpacity
             style={{
               width: "95%",
               alignItems: "center",
@@ -221,8 +262,6 @@ const OrderDetail = () => {
           </TouchableOpacity>
         </View>
       )}
-
-
     </SafeAreaView>
   );
 };

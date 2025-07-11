@@ -14,7 +14,7 @@ export const createOrderStyles = (theme = "light") => {
     },
     container: {
       flex: 1,
-      backgroundColor: color.listBackground,
+      backgroundColor: color.background,
       paddingTop: StatusBar.currentHeight || 0,
     },
     scrollContainer: {
