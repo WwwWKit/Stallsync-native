@@ -2,9 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { showAlert } from "../../constants/common";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -16,9 +14,10 @@ import {
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import api from "../../constants/APIs";
-import { Colors } from "../../constants/colors";
 import { useAuth } from "../../constants/AuthContext";
+import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
+import { showAlert } from "../../utils/common";
 const SignInScreen = () => {
   const { signIn } = useAuth();
   const router = useRouter();
@@ -102,6 +101,7 @@ const SignInScreen = () => {
                 returnKeyType="next"
               />
             </View>
+            
             <View style={[authStyles.inputContainer, authStyles.textInput]}>
               <TextInput
                 placeholder="Enter password"
@@ -122,7 +122,9 @@ const SignInScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress= { router.push("/forgetpw")}
+            >
               <Text style={authStyles.forgot}>FORGOT PASSWORD?</Text>
             </TouchableOpacity>
           </View>

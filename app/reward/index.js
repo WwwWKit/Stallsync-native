@@ -2,15 +2,15 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { createProductStyles } from "../../assets/styles/prddetail.styles";
+import { createRewardStyles } from "../../assets/styles/reward.styles";
 import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { rewardAPI } from "../../services/backendAPIs";
@@ -20,7 +20,7 @@ const RewardList = () => {
   const router = useRouter();
   const scheme = useColorScheme();
   const theme = Colors[scheme];
-  const styles = createProductStyles(scheme);
+  const styles = createRewardStyles(scheme);
 
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,18 +89,50 @@ const RewardList = () => {
         }
       >
         {rewards.map((reward) => (
-          <TouchableOpacity
-            key={reward.psrwduid}
-            style={styles.itemContainer}
-            onPress={() => router.push(`/reward/${reward.psrwduid}`)}
-          >
-            <View style={styles.textContainer}>
-              <Text style={styles.title}>{reward.psrwdnme}</Text>
-              <Text style={styles.description}>{reward.psrwddsc}</Text>
-              <Text>Status: {reward.psrwdstsdsc}</Text>
+          <TouchableOpacity key={reward.psrwduid} style={styles.card}>
+            <Text style={styles.title}>{reward.psrwdnme}</Text>
+
+            <View style={styles.info}>
               <Text>
-                Points: {reward.psrwdtypdsc}
+                {reward.psrwdmin > 0
+                  ? `Minimum spend RM${parseInt(reward.psrwdmin)}`
+                  : "No minimum spend"}
               </Text>
+
+              {reward.psrwdtyp === "P" ? (
+                <Text style={styles.off}>
+                  {parseInt(reward.psrwddva * 100)}% off
+                </Text>
+              ) : reward.psrwdtyp === "V" ? (
+                <Text style={styles.off}>
+                  RM{parseFloat(reward.psrwddva).toFixed(2)} off
+                </Text>
+              ) : null}
+
+              {reward.psrwdcap > 0 && (
+                <Text>Cap at RM{parseFloat(reward.psrwdcap).toFixed(2)}</Text>
+              )}
+              <Text>{reward.psrwddsc}</Text>
+              <Text> </Text>
+              {Array.isArray(reward.psmrcnames) &&
+                reward.psmrcnames.length > 0 && (
+                  <Text>Available at: {reward.psmrcnames.join(", ")}</Text>
+                )}
+
+              {reward.psrwdfdt && reward.psrwdtdt && (
+                <Text>
+                  Valid from
+                  <Text style={styles.date}>
+                    {" "}
+                    {new Date(reward.psrwdfdt).toLocaleDateString()}
+                  </Text>
+                  <Text> to</Text>
+                  <Text style={styles.date}>
+                    {" "}
+                    {new Date(reward.psrwdtdt).toLocaleDateString()}
+                  </Text>
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         ))}

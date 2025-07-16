@@ -55,7 +55,8 @@ const CartOverview = () => {
       const itemsByMerchant = {};
       await Promise.all(
         enriched.map(async (m) => {
-          const items = await cartAPI.listCartItems(m.psmrcuid);
+          const res = await cartAPI.listCartItems(m.psmrcuid);
+          const items = res.items;
           itemsByMerchant[m.psmrcuid] = items;
         })
       );
@@ -73,9 +74,8 @@ const CartOverview = () => {
     <SafeAreaView style={cartStyles.container}>
       <ScrollView contentContainerStyle={cartStyles.scrollContainer}>
         {merchantList.length === 0 ? (
-          <View style={{ padding: 20 }}>
-      
-            <Text style={{ textAlign: "center", fontSize: 16 , color: theme.text}}>
+          <View>
+            <Text style={cartStyles.emptyString}>
               Your cart is currently empty.
             </Text>
           </View>
@@ -87,31 +87,38 @@ const CartOverview = () => {
                 <TouchableOpacity
                   onPress={() => handleMerchantPress(merchant.psmrcuid)}
                 >
-                  <View>
-                    <View style={cartStyles.rowContainer}>
-                      <Text style={cartStyles.index}>{idx + 1}</Text>
-                      <Image
-                        source={
-                          merchant.img ? { uri: merchant.img } : defaultImage
-                        }
-                        style={cartStyles.image}
-                        resizeMode="cover"
-                      />
-                      <View>
-                        <Text style={cartStyles.name}>{merchant.psmrcnme}</Text>
-                        <Text style={cartStyles.subName}>{items.length} item(s) in cart</Text>
+                  <View style={cartStyles.flexstart}>
+                    <Text style={cartStyles.index}>{idx + 1}</Text>
+
+                    <View style={cartStyles.flex}>
+                      <View style={cartStyles.flexstart}>
+                        <Image
+                          source={
+                            merchant.img ? { uri: merchant.img } : defaultImage
+                          }
+                          style={cartStyles.image}
+                          resizeMode="cover"
+                        />
+                        <View>
+                          <Text style={cartStyles.name}>
+                            {merchant.psmrcnme}
+                          </Text>
+                          <Text style={cartStyles.subName}>
+                            {items.length} item(s) in cart
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                    <View style={cartStyles.separator} />
-                    <View style={cartStyles.itemListContainer}>
-                      {items.slice(0, 5).map((item) => (
-                        <Text key={item.psitmcno} style={cartStyles.item}>
-                          - {item.product.psprdnme} x{item.psitmqty}
-                        </Text>
-                      ))}
-                      {items.length > 5 && (
-                        <Text style={cartStyles.andmore}>... and more</Text>
-                      )}
+                      <View style={cartStyles.separator} />
+                      <View style={cartStyles.itemListContainer}>
+                        {items.slice(0, 5).map((item) => (
+                          <Text key={item.psitmcno} style={cartStyles.item}>
+                            - {item.product.psprdnme} x{item.psitmqty}
+                          </Text>
+                        ))}
+                        {items.length > 5 && (
+                          <Text style={cartStyles.andmore}>... and more</Text>
+                        )}
+                      </View>
                     </View>
                   </View>
                 </TouchableOpacity>

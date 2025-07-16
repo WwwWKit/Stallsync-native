@@ -39,7 +39,8 @@ const ProfileScreen = () => {
         router.push("/profile/term");
         break;
       case "Profile Setting":
-        router.push("/profile/${member.psmbruid}");
+        router.push(`/profile/${member.psmbruid}`);
+        break;
 
       case "Privacy Setting":
         router.push("/profile/setting");
@@ -94,7 +95,7 @@ const ProfileScreen = () => {
             ></Image>
           </TouchableOpacity>
           <View style={profileStyles.nameContainer}>
-            <View style={profileStyles.typeContainer}>{member.psmbrtyp}</View>
+            {/* <View style={profileStyles.typeContainer}>{member.psmbrtyp}</View> */}
             <Text style={profileStyles.nameText}>{member.psmbrnam}</Text>
           </View>
           <Text style={profileStyles.point}>points: {member.psmbrpts}</Text>

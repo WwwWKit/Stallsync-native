@@ -46,11 +46,11 @@ export const createAuthStyles = (theme = "light") => {
     label: {
       marginBottom: 10,
       color: color.text,
+      fontWeight: "bold",
     },
     guestText: {
-      color : color.icon,
-      textAlign: 'center',
-      
+      color: color.icon,
+      textAlign: "center",
     },
 
     formContainer: {
@@ -111,7 +111,7 @@ export const createAuthStyles = (theme = "light") => {
       padding: 16,
       fontSize: 16,
       borderRadius: 12,
-      backgroundColor:  color.background,
+      backgroundColor: color.background,
       borderColor: color.border,
       borderWidth: 1,
       color: color.text,
@@ -196,8 +196,83 @@ export const createAuthStyles = (theme = "light") => {
       color: color.primary,
       fontWeight: "600",
     },
-    emptyContainer:{
-      flex: 1
-    }
+    emptyContainer: {
+      flex: 1,
+    },
+    separator: {
+      height: 1,
+      backgroundColor: color.separator,
+      margin: 12,
+    },
+    scrollContainer: {
+      padding: 16,
+    },
+    editButton: {
+      width: "90%",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: color.primary,
+      borderRadius: 100,
+      margin: 20,
+      padding: 20,
+    },
+    editButtonText: {
+      color: color.text,
+      fontSize: 20,
+      fontWeight: "600",
+    },
+    modalContainer: {
+      position: "absolute",
+      bottom: 10,
+      width: "100%",
+      alignItems: "center",
+    },
+    modalBackground: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    dialog: {
+      backgroundColor: color.white,
+      padding: 24,
+      borderRadius: 12,
+      width: "80%",
+      alignItems: "center",
+    },
+    dialogText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 12,
+    },
+    dialogText2: {
+      marginBottom: 20,
+      textAlign: "center",
+    },
+    buttonRow: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    discardButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      backgroundColor: color.greyBackground,
+    },
+    confirmButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      backgroundColor: color.primary,
+    },
+    confirmText: { color: color.text },
+
+    resetButton: {
+      backgroundColor: color.primary,
+      paddingVertical: 18,
+      borderRadius: 12,
+      marginTop: 20,
+      marginBottom: 30,
+    },
   });
 };

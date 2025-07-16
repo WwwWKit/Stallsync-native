@@ -18,6 +18,7 @@ export const merchantAPI = {
       const res = await api.get("/psmrcpar/detail", {
         params: { id },
       });
+      // 如果props中有当前主题的颜色，则返回该颜色
       return res.data.message;
     } catch (err) {
       console.log("Error in get merchant:", err);
@@ -37,7 +38,7 @@ export const productAPI = {
   listProducts: async (query, params = {}) => {
     try {
       const res = await api.get("/psprdpar/list", {
-        params: { search: query,  limit: 50, ...params  },
+        params: { search: query, limit: 50, ...params },
       });
       return res.data.message?.data || [];
     } catch (err) {
@@ -56,7 +57,7 @@ export const productAPI = {
     }
   },
 
-   listLatest: async () => {
+  listLatest: async () => {
     try {
       const res = await api.get("/psprdpar/listLatest");
       return res.data.message?.data || [];
@@ -66,7 +67,7 @@ export const productAPI = {
     }
   },
 
-   listTrending: async () => {
+  listTrending: async () => {
     try {
       const res = await api.get("/psprdpar/listTrending");
       return res.data.message?.data || [];
@@ -202,7 +203,6 @@ export const cartAPI = {
   listMerchant: async () => {
     try {
       const res = await api.get(`/psmbrcrt/listMerchant`);
-      console.log("res", res);
       return res.data.message.data;
     } catch (error) {
       console.log("Error in list merchant:", error);
@@ -215,6 +215,7 @@ export const cartAPI = {
       const res = await api.get(`/psmbrcrt/cartItems`, {
         params: { psmrcuid: merchantid },
       });
+
       return res.data.message || [];
     } catch (error) {
       console.log("Error in list cart items:", error);
@@ -224,7 +225,7 @@ export const cartAPI = {
 };
 
 export const orderAPI = {
-  listOrders: async (query) => {
+  listOrders: async () => {
     try {
       const res = await api.get("/psordpar/list");
       return res.data.message?.data || [];
@@ -250,28 +251,6 @@ export const orderAPI = {
       return res.data;
     } catch (err) {
       console.log("Error in create order:", err);
-      return [];
-    }
-  },
-
-  deleteOrder: async (id) => {
-    try {
-      const res = await api.post(`/psordpar/delete?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in delete order:", err);
-      return [];
-    }
-  },
-
-  updateOrder: async (id, status) => {
-    try {
-      const res = await api.post(`/psordpar/update?id=${id}&status=${status}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in update order:", err);
       return [];
     }
   },
@@ -368,7 +347,9 @@ export const transactionAPI = {
 export const userAPI = {
   getUser: async (id) => {
     try {
-      const res = await api.get(`/psusrpar/detail`, {params: { psmbruid: id }});
+      const res = await api.get(`/psusrpar/detail`, {
+        params: { psmbruid: id },
+      });
       return res.data.message;
     } catch (err) {
       console.error("Failed to get user:", err);
@@ -387,23 +368,16 @@ export const userAPI = {
     }
   },
 
-  deleteUser: async (id) => {
+  changePassword: async (oldPassword, newPassword, conPassword) => {
     try {
-      const res = await api.post(`/psusrpar/delete?id=${id}`);
-      return data;
+      const res = await api.post(`/psusrprf/change_password`, {
+        password: oldPassword,
+        newpassword: newPassword,
+        conpassword: conPassword
+      });
+      return res.data;
     } catch (err) {
-      console.error("Failed to delete user:", err);
-      return { error: true };
-    }
-  },
-
-  updateUser: async (id, status) => {
-    try {
-      const res = await api.post(`/psusrpar/update?id=${id}&status=${status}`);
-      const data = await res.json();
-      return data;
-    } catch (err) {
-      console.error("Failed to update user:", err);
+      console.error("Failed to change password:", err);
       return { error: true };
     }
   },
@@ -430,22 +404,10 @@ export const memberAPI = {
     }
   },
 
-  deleteMember: async (id) => {
+  updateMember: async (payload) => {
     try {
-      const res = await api.post(`/psmbrpar/delete?id=${id}`);
-      const data = await res.json();
-      return data;
-    } catch (err) {
-      console.error("Failed to delete member:", err);
-      return { error: true };
-    }
-  },
-
-  updateMember: async (id, status) => {
-    try {
-      const res = await api.post(`/psmbrpar/update?id=${id}&status=${status}`);
-      const data = await res.json();
-      return data;
+      const res = await api.post(`/psmbrprf/update`, payload);
+      return res.data;
     } catch (err) {
       console.error("Failed to update member:", err);
       return { error: true };
@@ -456,23 +418,25 @@ export const memberAPI = {
 export const rewardAPI = {
   listRewards: async () => {
     try {
-      const res = await api.get(`/psrwdpar/list`);
-      return res.data.message?.data || []
+      const res = await api.get(`/psrwdpar/listAvailable`);
+      return res.data.message?.data || [];
     } catch (err) {
       console.log("Error in list voucher:", err);
       return [];
     }
   },
 
-  getReward: async (id) => {
+  rewardddl: async (merchantid) => {
     try {
-      const res = await api.get(`/psvchrpar/detail?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.get(`/ddl/reward`, {
+        params: {psmrcuid: merchantid}
+      } );
+      return res.data?.message?.data || [];
     } catch (err) {
-      console.log("Error in get voucher:", err);
+      console.log("Error in list voucher:", err);
       return [];
     }
+
   },
 
   createReward: async (id) => {
@@ -485,7 +449,6 @@ export const rewardAPI = {
       return [];
     }
   },
-
 };
 
 export const uploadAPI = {

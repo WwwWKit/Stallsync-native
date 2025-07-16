@@ -120,18 +120,21 @@ export const Colors = {
     background: "#fff", //white
     tint: tintedGold, // light gold
     icon: "#687076", // dark grey
-    tabIconDefault: "#687076",  // dark grey
-    tabIconSelected: tintedGold,  // light gold
-    border: "#C2A76D",  // gold
+    tabIconDefault: "#687076", // dark grey
+    tabIconSelected: tintedGold, // light gold
+    border: "#C2A76D", // gold
     textLight: "#11181C", // black
     placeholder: "#4f4f4f", //  grey
-    textPlaceholder: "#888",  // light grey
+    textPlaceholder: "#888", // light grey
     separator: "#e0e0e0", // light grey
     view: "#fff",
     shadowColor: "#000",
-    listBackground:"#fff",
+    listBackground: "#fff",
     white: "#fff",
-
+    greyBackground: "#f5f5f5",
+    bronze: "#cd7f32",
+    silver: "#c0c0c0",
+    gold: "#ffd700",
   },
   dark: {
     primary: "#C2A76D",
@@ -140,20 +143,22 @@ export const Colors = {
     background: "#151718", // black
     tint: tintedGold, // light gold
     icon: "#9BA1A6", // grey
-    tabIconDefault: "#9BA1A6",  // grey
-    tabIconSelected: tintedGold,  // light gold
-    border: "#C2A76D",  // gold
+    tabIconDefault: "#9BA1A6", // grey
+    tabIconSelected: tintedGold, // light gold
+    border: "#C2A76D", // gold
     textLight: "#EBEBEB", // white with grey
     placeholder: "#4f4f4f", // grey
-    textPlaceholder: "#888",   // light grey
+    textPlaceholder: "#888", // light grey
     separator: "#e0e0e0",
-    view:"#151718",
+    view: "#151718",
     shadowColor: "#fff",
-    listBackground:"#1E1F21",
+    listBackground: "#1E1F21",
     white: "#fff",
-
+    greyBackground: "#f5f5f5",
+    bronze: "#cd7f32",
+    silver: "#c0c0c0",
+    gold: "#ffd700",
   },
-
 };
 
 // #075985 IOS blue

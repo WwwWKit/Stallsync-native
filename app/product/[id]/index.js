@@ -1,12 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { showAlert } from "../../../constants/common";
 import {
   ActivityIndicator,
-  Alert,
   Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   Text,
@@ -19,6 +16,7 @@ import { createProductStyles } from "../../../assets/styles/prddetail.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import { cartAPI, productAPI } from "../../../services/backendAPIs";
+import { showAlert } from "../../../utils/common";
 
 const ProductPage = () => {
   const { id } = useLocalSearchParams(); // grabs the dynamic ID from the URL

@@ -12,7 +12,7 @@ import {
 import { createCartStyles } from "../../../assets/styles/cart.styles";
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
-import { getReturnUrl, showAlert } from "../../../constants/common";
+import { getReturnUrl, showAlert } from "../../../utils/common";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import {
   orderAPI,

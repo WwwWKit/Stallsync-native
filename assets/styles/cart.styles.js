@@ -23,17 +23,23 @@ export const createCartStyles = (theme = "light") => {
       borderRadius: 10,
     },
     card: {
-      padding: 12,
-      borderRadius: 10,
-      marginBottom: 12,
-      alignItems: "flex-start",
+      padding: 10,
       backgroundColor: color.background,
+      borderRadius: 10,
+      marginBottom: 10,
+      shadowColor: color.shadowColor,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      overflow: "hidden",
+      borderRadius: 10,
     },
     index: {
       marginHorizontal: 8,
       fontWeight: "700",
       fontSize: 16,
-      color: color.text
+      color: color.text,
     },
     contentContainer: {
       backgroundColor: color.background,
@@ -53,12 +59,10 @@ export const createCartStyles = (theme = "light") => {
       fontWeight: "600",
       marginBottom: 5,
       color: color.text,
-      
     },
 
-     subName: { 
-     
-      color: color.text
+    subName: {
+      color: color.text,
     },
     itemListContainer: {
       marginHorizontal: 16,
@@ -66,13 +70,12 @@ export const createCartStyles = (theme = "light") => {
     },
     item: {
       fontSize: 16,
-      color: color.text
+      color: color.text,
     },
     andmore: {
       color: color.textPlaceholder,
       fontWeight: "700",
       fontSize: 14,
-      
     },
     productImage: {
       width: 100,
@@ -80,14 +83,29 @@ export const createCartStyles = (theme = "light") => {
       marginRight: 16,
       borderRadius: 8,
     },
-
-    rowContainer: {
+    flex:{ flex: 1},
+    flexstart: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+    },
+    spacebetween: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    rowContainer2: {
       width: "100%",
       flexDirection: "row",
-      marginBottom: 8,
+      paddingHorizontal: 16,
       justifyContent: "space-between",
       alignItems: "center",
-      
+    },
+    rowContainer3: {
+      width: "100%",
+      flexDirection: "row",
+      marginBottom: 4,
+      paddingHorizontal: 16,
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     price: {
       fontSize: 18,
@@ -96,13 +114,12 @@ export const createCartStyles = (theme = "light") => {
       fontSize: 16,
       color: color.textPlaceholder,
       marginTop: 8,
-      
     },
     remark: {
       fontSize: 18,
       color: color.textPlaceholder,
     },
-    addmore:{
+    addmore: {
       color: color.primary,
       fontWeight: "600",
       fontSize: 16,
@@ -112,7 +129,7 @@ export const createCartStyles = (theme = "light") => {
     separator: {
       height: 1,
       backgroundColor: color.separator,
-      margin: 12
+      margin: 12,
     },
     subtotal: {
       fontSize: 22,
@@ -122,8 +139,6 @@ export const createCartStyles = (theme = "light") => {
     total: {
       fontSize: 20,
       alignSelf: "flex-end",
-      marginHorizontal: 16,
-
     },
     gtotal: {
       fontSize: 24,
@@ -131,6 +146,65 @@ export const createCartStyles = (theme = "light") => {
       alignSelf: "flex-end",
       marginHorizontal: 16,
       marginTop: 5,
-    }
+    },
+
+    applyButton: {
+      backgroundColor: color.primary,
+      padding: 12,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 16,
+    },
+    applyText: {
+      color: color.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    rewardButton: {
+      padding: 10,
+      borderRadius: 8,
+      marginLeft: 16,
+    },
+    floatingButton: {
+      position: "absolute",
+      bottom: 10,
+      width: "100%",
+      alignItems: "center",
+    },
+    checkoutButton: {
+      width: "95%",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: color.primary,
+      borderRadius: 100,
+      margin: 20,
+      padding: 20,
+    },
+    checkoutText: { color: theme.text, fontSize: 20, fontWeight: "600" },
+
+    modal: { justifyContent: "flex-end", margin: 0 },
+    modalContent: {
+      backgroundColor: "white",
+      padding: 20,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 20,
+    },
+    modalText: {
+      fontSize: 16,
+      paddingVertical: 12,
+    },
+    modalCancel: { color: "red" },
+
+    emptyString: {
+      textAlign: "center",
+      fontSize: 16,
+      color: theme.text,
+    },
   });
 };

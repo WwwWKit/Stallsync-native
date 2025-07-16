@@ -17,16 +17,23 @@ export default function CheckoutCancel() {
       return;
     }
 
-    api.get("/pstrxpar/cancel?session_id=" + session_id)
-      .then(() => console.log("❌ Payment cancelled. Stripe session ID:", session_id))
-      .catch(err => console.error("Cancel request error:", err));
+    api
+      .get("/pstrxpar/cancel?session_id=" + session_id)
+      .then(() =>
+        console.log("❌ Payment cancelled. Stripe session ID:", session_id)
+      )
+      .catch((err) => console.error("Cancel request error:", err));
   }, [session_id]);
 
   return (
-    <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <SafeAreaView
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    >
       <Text style={{ fontSize: 28, fontWeight: "600", color: "red" }}>
         Payment Cancelled
       </Text>
+      <Text>Please proceed online payment at order history</Text>
+      <Text>or cash payment at counter.</Text>
       <TouchableOpacity
         onPress={() => router.replace("/")}
         style={{
@@ -39,7 +46,7 @@ export default function CheckoutCancel() {
         }}
       >
         <Text style={{ fontSize: 16, fontWeight: "600", color: theme.primary }}>
-          Back to Order Page
+          Back to Home Page
         </Text>
       </TouchableOpacity>
     </SafeAreaView>

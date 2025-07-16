@@ -1,12 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { showAlert } from "../../constants/common";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -17,10 +14,11 @@ import {
   View,
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
+import DatePicker from "../../components/DatePicker";
 import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { memberAPI, userAPI } from "../../services/backendAPIs";
-import { DateFormatter } from "../../utils/dateFormatter";
+import { showAlert } from "../../utils/common";
 
 const SignUpScreen = () => {
   const scheme = useColorScheme();
@@ -33,7 +31,7 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [phonePre, setPhonePre] = useState("MY");
+  const [phonePre, setPhonePre] = useState("+60");
   const [phone, setPhone] = useState("");
   const [dob, setDob] = useState("");
   const [tempDob, setTempDob] = useState(new Date());
@@ -92,7 +90,7 @@ const SignUpScreen = () => {
         psusrpwd: password,
         psusrnam: name,
         psusreml: email,
-        psusrpre: phonePre,
+        psusrpre: "MY",
         psusrphn: phone,
         psusrrol: "MBR",
         psusrtyp: "MBR",
@@ -109,7 +107,7 @@ const SignUpScreen = () => {
         psmbrnam: name,
         psmbreml: email,
         psmbrphn: phone,
-        psmbrpre: phonePre,
+        psmbrpre: "MY",
         psusrnme: username,
         psmbrdob: dob,
       };
@@ -129,7 +127,7 @@ const SignUpScreen = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <SafeAreaView style={authStyles.container}>
       <KeyboardAvoidingView
@@ -148,6 +146,7 @@ const SignUpScreen = () => {
             />
           </View>
           <Text style={authStyles.title}>Sign Up StallSync</Text>
+
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Username</Text>
             <TextInput
@@ -160,25 +159,27 @@ const SignUpScreen = () => {
               autoCapitalize="none"
             ></TextInput>
           </View>
-          <Text style={authStyles.label}>Password</Text>
-          <View style={[authStyles.inputContainer, authStyles.textInput]}>
-            <TextInput
-              placeholder="Enter Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={authStyles.eyeButton}
-              onPress={() => setShowPassword((prev) => !prev)}
-            >
-              <Ionicons
-                name={showPassword ? "eye-outline" : "eye-off-outline"}
-                size={20}
-                color={theme.textLight}
+          <View style={authStyles.inputContainer}>
+            <Text style={authStyles.label}>Password</Text>
+            <View style={[authStyles.textInput]}>
+              <TextInput
+                placeholder="Enter Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
               />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={authStyles.eyeButton}
+                onPress={() => setShowPassword((prev) => !prev)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={20}
+                  color={theme.textLight}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Email</Text>
@@ -204,87 +205,37 @@ const SignUpScreen = () => {
               returnKeyType="next"
             ></TextInput>
           </View>
-          <Text style={authStyles.label}>Phone Number</Text>
-          <View style={[authStyles.inputContainer, authStyles.phoneInput]}>
-            <TouchableOpacity
-              style={authStyles.phonePrefix}
-              onPress={() => {
-                // TODO: Implement phone prefix selection
-              }}
-            >
-              <Text style={authStyles.prefixText}>{phonePre}</Text>
-            </TouchableOpacity>
 
-            <TextInput
-              placeholder="Phone Number"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
-          </View>
-          <Text style={authStyles.label}>Birthday</Text>
-
-          {/* web DateTimePicker */}
-
-          {Platform.OS === "web" ? (
-            <View style={authStyles.inputContainer}>
-              <input
-                type="date"
-                style={authStyles.webDatePicker}
-                value={dob ? DateFormatter(new Date(dob)) : ""}
-                onChange={(e) => {
-                  setDob(new Date(e.target.value));
-                  setTempDob(new Date(e.target.value));
+          <View style={authStyles.inputContainer}>
+            <Text style={authStyles.label}>Phone Number</Text>
+            <View style={authStyles.phoneInput}>
+              <TouchableOpacity
+                style={authStyles.phonePrefix}
+                onPress={() => {
+                  // TODO: Implement phone prefix selection
                 }}
+              >
+                <Text style={authStyles.prefixText}>{phonePre}</Text>
+              </TouchableOpacity>
+
+              <TextInput
+                placeholder="Phone Number"
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
               />
             </View>
-          ) : (
-            <>
-              {!showDatePicker && (
-                <TouchableOpacity
-                  style={authStyles.dobButton}
-                  onPress={toggleDatePicker}
-                >
-                  <TextInput
-                    placeholder="Select Date"
-                    style={authStyles.dobText}
-                    editable={false}
-                    value={dob ? DateFormatter(dob) : ""}
-                    pointerEvents="none"
-                  />
-                </TouchableOpacity>
-              )}
+          </View>
 
-              {showDatePicker && (
-                <DateTimePicker
-                  mode="date"
-                  display="spinner"
-                  value={tempDob}
-                  onChange={onChange}
-                  style={authStyles.datePicker}
-                  maximumDate={new Date()}
-                />
-              )}
-            </>
-          )}
-          {showDatePicker && Platform.OS === "ios" && (
-            <View style={authStyles.iosDatePicker}>
-              <TouchableOpacity
-                onPress={toggleDatePicker}
-                style={authStyles.cancelButton}
-              >
-                <Text style={authStyles.cancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={confirmIosDate}
-                style={authStyles.pickerButton}
-              >
-                <Text style={[authStyles.buttonText, { color: "#fff" }]}>
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <DatePicker
+            label="Birthday"
+            value={dob}
+            onChange={(date) => {
+              setDob(date);
+              setTempDob(date);
+            }}
+            styles={authStyles}
+          />
           <TouchableOpacity
             style={[
               authStyles.authButton,

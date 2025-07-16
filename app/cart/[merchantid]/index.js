@@ -11,18 +11,20 @@ import {
   Text,
   TouchableOpacity,
   useColorScheme,
-  View
+  View,
 } from "react-native";
 import Modal from "react-native-modal";
 import { createCartStyles } from "../../../assets/styles/cart.styles";
+import ToggleButton from "../../../components/ToggleButton";
 import { Colors } from "../../../constants/colors";
-import { getReturnUrl, showAlert } from "../../../constants/common";
 import {
   cartAPI,
   orderAPI,
   productAPI,
+  rewardAPI,
   transactionAPI,
 } from "../../../services/backendAPIs";
+import { getReturnUrl, showAlert } from "../../../utils/common";
 
 const CartDetail = () => {
   const router = useRouter();
@@ -31,12 +33,21 @@ const CartDetail = () => {
   const theme = Colors[scheme];
   const cartStyles = createCartStyles(theme);
   const { merchantid } = useLocalSearchParams();
+
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [applyPoints, setApplyPoints] = useState("N");
+  const [applyReward, setApplyReward] = useState("N");
   const [sst, setSst] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [total, setTotal] = useState(0);
+  const [pointDisc, setPointDisc] = useState(0);
+  const [rewardDisc, setRewardDisc] = useState(0);
+  const [userPoints, setUserPoints] = useState(0);
+  const [rewardOptions, setRewardOptions] = useState([]);
+  const [filteredRewardOptions, setFilteredRewardOptions] = useState([]);
+  const [selectedReward, setSelectedReward] = useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,21 +59,79 @@ const CartDetail = () => {
     });
   }, [navigation]);
 
-  const calculate = async () => {
-    const subtotal = parseFloat(
-      cartItems.reduce((acc, item) => acc + parseFloat(item.psitmsbt), 0)
-    ).toFixed(2);
-    const sst = parseFloat(subtotal * 0.06).toFixed(2);
-    const total = parseFloat(subtotal) + parseFloat(sst);
+  const calculate = () => {
+    const subtotalVal = cartItems.reduce(
+      (acc, item) => acc + parseFloat(item.psitmsbt),
+      0
+    );
 
-    setSubtotal(parseFloat(subtotal).toFixed(2));
-    setSst(sst);
-    setTotal(total.toFixed(2));
+    let rewardDisc = 0;
+    let pointDisc = 0;
+
+    if (applyPoints === "Y") {
+      pointDisc = userPoints / 100;
+      if (pointDisc > subtotalVal) pointDisc = subtotalVal;
+    }
+
+    if (applyReward === "Y" && selectedReward) {
+      const reward = selectedReward;
+      if (reward.psrwdtyp === "P") {
+        rewardDisc = subtotalVal * reward.psrwddva;
+        if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
+          rewardDisc = reward.psrwdcap;
+      } else if (reward.psrwdtyp === "V") {
+        rewardDisc = parseFloat(reward.psrwddva);
+        if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
+          rewardDisc = reward.psrwdcap;
+      }
+      if (rewardDisc > subtotalVal - pointDisc)
+        rewardDisc = subtotalVal - pointDisc;
+    }
+
+    const discountedSubtotal =
+      parseFloat(subtotalVal) - parseFloat(pointDisc) - parseFloat(rewardDisc);
+    const sstVal = parseFloat(discountedSubtotal) * 0.06;
+    const totalVal = parseFloat(discountedSubtotal) + parseFloat(sstVal);
+
+    setSubtotal(parseFloat(subtotalVal).toFixed(2));
+    setPointDisc(parseFloat(pointDisc).toFixed(2));
+    setRewardDisc(parseFloat(rewardDisc).toFixed(2));
+    setSst(parseFloat(sstVal).toFixed(2));
+    setTotal(parseFloat(totalVal).toFixed(2));
+  };
+
+  const fetchCartItem = async () => {
+    try {
+      const res = await cartAPI.listCartItems(merchantid);
+      const items = res.items;
+      const enriched = await Promise.all(
+        items.map(async (item) => ({
+          ...item,
+          image: productAPI.fetchImage(item.product.psprdimg),
+        }))
+      );
+      setCartItems(enriched);
+      setUserPoints(res.mbrPts);
+    } catch (error) {
+      console.log("Failed to fetch cart items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAvailableReward = async () => {
+    try {
+      const rewards = await rewardAPI.rewardddl(merchantid);
+      setRewardOptions(rewards);
+    } catch (error) {
+      console.log("Failed to fetch rewards:", error);
+    }
   };
 
   useEffect(() => {
     if (merchantid) {
       fetchCartItem();
+      fetchAvailableReward();
     }
   }, [merchantid]);
 
@@ -70,24 +139,75 @@ const CartDetail = () => {
     if (cartItems.length > 0) {
       calculate();
     }
-  }, [cartItems]);
+  }, [cartItems, applyPoints, applyReward, selectedReward]);
 
-  const fetchCartItem = async () => {
+  useEffect(() => {
+    const subtotalVal = cartItems.reduce(
+      (acc, item) => acc + parseFloat(item.psitmsbt),
+      0
+    );
+
+    const eligibleRewards = rewardOptions.filter((reward) => {
+      const minSpend = parseFloat(reward.psrwdmin || 0);
+      return subtotalVal >= minSpend;
+    });
+
+    setFilteredRewardOptions(eligibleRewards);
+
+    if (
+      selectedReward &&
+      !eligibleRewards.find((r) => r.psrwduid === selectedReward.psrwduid)
+    ) {
+      setSelectedReward(null);
+    }
+  }, [cartItems, rewardOptions]);
+
+  const createOrder = async () => {
+    const orderPayload = {
+      psordrap: applyReward,
+      psordpap: applyPoints,
+      psrwduid: selectedReward?.psrwduid || "",
+      psmrcuid: merchantid,
+    };
+
     try {
-      const res = await cartAPI.listCartItems(merchantid);
-      const enriched = await Promise.all(
-        res.map(async (item) => ({
-          ...item,
-          image: productAPI.fetchImage(item.product.psprdimg),
-        }))
-      );
-
-      setCartItems(enriched);
+      const orderRes = await orderAPI.createOrder(orderPayload);
+      if (!orderRes || !orderRes.message?.ordId)
+        throw new Error("Invalid order response");
+      return orderRes.message.ordId;
     } catch (error) {
-      console.log("Failed to fetch cart items:", error);
+      console.error("Order creation failed:", error);
+      showAlert("Order Creation Failed", "Please try again later.");
+      return null;
+    }
+  };
+
+  const handleOnlineCheckout = async () => {
+    setLoading(true);
+    try {
+      const ordId = await createOrder();
+      if (!ordId) throw new Error("Order creation failed");
+      const trxRes = await transactionAPI.createOnline(ordId, total, {
+        returnUrl: getReturnUrl(),
+      });
+      if (!trxRes?.url) throw new Error("Transaction failed");
+
+      Platform.OS === "web"
+        ? (window.location.href = trxRes.url)
+        : await WebBrowser.openAuthSessionAsync(
+            trxRes.url,
+            getReturnUrl() + "/checkout"
+          );
+    } catch (e) {
+      console.error(e);
+      showAlert("Checkout Error", e.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOfflineCheckout = () => {
+    router.replace("/checkout/offline");
   };
 
   if (loading)
@@ -104,109 +224,6 @@ const CartDetail = () => {
       </SafeAreaView>
     );
 
-  const createOrder = async () => {
-    const orderPayload = {
-      psordrap: "N",
-      psordpap: "N",
-      psmrcuid: merchantid,
-    };
-    //   const orderRes = await orderAPI.createOrder(orderPayload);
-    //  // console.log("Order response:", orderRes);
-    //   const ordId = orderRes.message.ordId;
-    //   // console.log("Catched ID:", ordId);
-
-    //   if (orderRes.error) {
-    //     console.log("Failed to create order:", orderRes.error);
-    //     return;
-    //   }
-    //   return ordId;
-    try {
-      const orderRes = await orderAPI.createOrder(orderPayload, {
-        timeout: 15000,
-      });
-
-      if (!orderRes || !orderRes.message?.ordId) {
-        throw new Error("Order response is invalid.");
-      }
-
-      return orderRes.message.ordId;
-    } catch (error) {
-      console.error("Error in create order:", error);
-   showAlert(
-        "Order Creation Failed",
-        "Unable to place order. Please try again later."
-      );
-      return null;
-    }
-  };
-
-  // const   handleOnlineCheckout = async () => {
-  //   const createdOrdId = await createOrder();
-  //   if (!createdOrdId) return;
-
-  //   const trxRes = await transactionAPI.createOnline(createdOrdId, total, {
-  //     returnUrl: getReturnUrl(),
-  //   });
-
-  //   if (trxRes?.url) {
-  //     const paymentUrl = trxRes.url;
-
-  //     if (Platform.OS === "web") {
-
-  //         console.log("Redirecting to Stripe:", paymentUrl);
-  //         window.location.href = paymentUrl;
-
-  //     } else {
-  //       const result = await WebBrowser.openAuthSessionAsync(
-  //         paymentUrl,
-  //         getReturnUrl() + "/checkout"
-  //       );
-
-  //       if (result.type === "success" && result.url.includes("success")) {
-  //         console.log("Payment success");
-  //       } else {
-  //         console.log("Payment cancelled");
-  //       }
-  //     }
-  //   } else {
-  //     showAlert("Stripe session not created");
-  //   }
-  // };
-  const handleOnlineCheckout = async () => {
-    setLoading(true); // show spinner
-    try {
-      const createdOrdId = await createOrder();
-      if (!createdOrdId) throw new Error("Order failed");
-
-      const trxRes = await transactionAPI.createOnline(createdOrdId, total, {
-        returnUrl: getReturnUrl(),
-      });
-      if (!trxRes?.url) throw new Error("Payment session error");
-
-      // Immediately redirect
-      const paymentUrl = trxRes.url;
-      Platform.OS === "web"
-        ? (window.location.href = paymentUrl)
-        : await WebBrowser.openAuthSessionAsync(
-            paymentUrl,
-            getReturnUrl() + "/checkout"
-          );
-    } catch (e) {
-      console.error(e);
-      showAlert("Checkout Error", e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOfflineCheckout = async () => {
-    const createdOrdId = await createOrder();
-    if (!createdOrdId) return;
-
-    const trxRes = await transactionAPI.createOffline(createdOrdId, total);
-    router.push("/checkout/offline");
-  };
-
   return (
     <SafeAreaView style={cartStyles.container}>
       <ScrollView
@@ -215,122 +232,143 @@ const CartDetail = () => {
       >
         {cartItems.map((item) => (
           <View key={item.psitmcno}>
-            <View style={cartStyles.rowContainer}>
-              <View>
-                <View style={cartStyles.rowContainer}>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={cartStyles.productImage}
-                    resizeMode="cover"
-                  />
-                  <View>
-                    <Text style={cartStyles.name}>{item.product.psprdnme}</Text>
-                    <Text style={cartStyles.price}>RM {item.psitmunt}</Text>
-                    <Text style={cartStyles.quantity}>
-                      Qty: {item.psitmqty}
-                    </Text>
-                  </View>
+            <View style={cartStyles.spacebetween}>
+              <View style={cartStyles.flexstart}>
+                <Image
+                  source={{ uri: item.image }}
+                  style={cartStyles.productImage}
+                  resizeMode="cover"
+                />
+                <View>
+                  <Text style={cartStyles.name}>{item.product.psprdnme}</Text>
+                  <Text style={cartStyles.price}>RM {item.psitmunt}</Text>
+                  <Text style={cartStyles.quantity}>Qty: {item.psitmqty}</Text>
                 </View>
-                {item.psitmrmk ? (
-                  <Text style={cartStyles.remark}> ** {item.psitmrmk}</Text>
-                ) : null}
               </View>
-
+              <View>
               <Text style={cartStyles.subtotal}>RM {item.psitmsbt}</Text>
             </View>
+            </View>
+            
+            {item.psitmrmk && (
+              <Text style={cartStyles.remark}> ** {item.psitmrmk}</Text>
+            )}
             <View style={cartStyles.separator} />
           </View>
         ))}
-        <TouchableOpacity onPress={ () => router.push(`/merchant/${merchantid}`) }>
+
+        <TouchableOpacity
+          onPress={() => router.replace(`/merchant/${merchantid}`)}
+        >
           <Text style={cartStyles.addmore}>Add More</Text>
         </TouchableOpacity>
       </ScrollView>
+
       <View style={cartStyles.contentContainer}>
-        <View style={cartStyles.rowContainer}>
-          <Text style={cartStyles.total}>Subtotal :</Text>
-          <Text style={cartStyles.total}>{subtotal}</Text>
+        <View style={cartStyles.rowContainer3}>
+          <Text style={cartStyles.total}>
+            Apply Points: (Available Points: {userPoints})
+          </Text>
+          <ToggleButton value={applyPoints} onChange={setApplyPoints} />
         </View>
-        <View style={cartStyles.rowContainer}>
+        <View style={cartStyles.rowContainer3}>
+          <Text style={cartStyles.total}>Apply Reward:</Text>
+          <ToggleButton value={applyReward} onChange={setApplyReward} />
+        </View>
+
+        {applyReward === "Y" && (
+          <ScrollView horizontal>
+            {filteredRewardOptions.map((reward) => (
+              <TouchableOpacity
+                key={reward.psrwduid}
+                style={[
+                  cartStyles.rewardButton,
+                  {
+                    backgroundColor:
+                      selectedReward?.psrwduid === reward.psrwduid
+                        ? theme.primary
+                        : theme.greyBackground,
+                  },
+                ]}
+                onPress={() => setSelectedReward(reward)}
+              >
+                <Text
+                  style={{
+                    color:
+                      selectedReward?.psrwduid === reward.psrwduid
+                        ? theme.white
+                        : theme.text,
+                  }}
+                >
+                  {reward.psrwdnme}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+      </View>
+
+      <View style={cartStyles.contentContainer}>
+        <View style={cartStyles.rowContainer2}>
+          <Text style={cartStyles.total}>Subtotal :</Text>
+          <Text style={cartStyles.total}>RM {subtotal}</Text>
+        </View>
+        <View style={cartStyles.rowContainer2}>
+          <Text style={cartStyles.total}>Points Disc :</Text>
+          <Text style={cartStyles.total}>- RM {pointDisc}</Text>
+        </View>
+        <View style={cartStyles.rowContainer2}>
+          <Text style={cartStyles.total}>Reward Disc :</Text>
+          <Text style={cartStyles.total}>- RM {rewardDisc}</Text>
+        </View>
+        <View style={cartStyles.rowContainer2}>
           <Text style={cartStyles.total}>SST (6%) :</Text>
-          <Text style={cartStyles.total}>{sst}</Text>
+          <Text style={cartStyles.total}>RM {sst}</Text>
         </View>
         <View style={cartStyles.separator}></View>
-        <View style={cartStyles.rowContainer}>
+        <View style={cartStyles.spacebetween}>
           <Text style={cartStyles.gtotal}>TOTAL :</Text>
-          <Text style={cartStyles.gtotal}>{total}</Text>
+          <Text style={cartStyles.gtotal}>RM {total}</Text>
         </View>
         <View style={{ height: 100 }} />
       </View>
-      <View
-        style={{
-          position: "absolute",
-          bottom: 10,
-          width: "100%",
-          alignItems: "center",
-        }}
-      >
+
+      <View style={cartStyles.floatingButton}>
         <TouchableOpacity
-          style={{
-            width: "95%",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: theme.primary,
-            borderRadius: 100,
-            margin: 20,
-            padding: 20,
-          }}
+          style={cartStyles.checkoutButton}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}>
-            Checkout
-          </Text>
+          <Text style={cartStyles.checkoutText}>Checkout</Text>
         </TouchableOpacity>
       </View>
 
-      
       <Modal
         isVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
-        style={{ justifyContent: "flex-end", margin: 0 }}
+        style={cartStyles.modal}
       >
-        <View
-          style={{
-            backgroundColor: "white",
-            padding: 20,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 20 }}>
-            Choose Payment Method
-          </Text>
+        <View style={cartStyles.modalContent}>
+          <Text style={cartStyles.modalTitle}>Choose Payment Method</Text>
           <TouchableOpacity
-            style={{ paddingVertical: 12 }}
             onPress={() => {
               setModalVisible(false);
               handleOfflineCheckout();
             }}
           >
-            <Text style={{ fontSize: 16 }}>Pay at Counter</Text>
+            <Text style={cartStyles.modalText}>Pay at Counter</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            style={{ paddingVertical: 12 }}
             onPress={() => {
               setModalVisible(false);
               handleOnlineCheckout();
             }}
           >
-            <Text style={{ fontSize: 16 }}>Online Payment</Text>
+            <Text style={cartStyles.modalText}>Online Payment</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ paddingVertical: 12 }}
-            onPress={() => {
-              setModalVisible(false);
-            }}
-          >
-            <Text style={{ fontSize: 16, color: "red" }}>Cancel</Text>
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={[cartStyles.modalText, cartStyles.modalCancel]}>
+              Cancel
+            </Text>
           </TouchableOpacity>
         </View>
       </Modal>

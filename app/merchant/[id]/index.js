@@ -4,14 +4,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import defaultImage from "../../../assets/images/default.png";
 import { createCategoryStyles } from "../../../assets/styles/category.styles";
@@ -19,7 +17,7 @@ import { createMrcDetailStyles } from "../../../assets/styles/mrcdetail.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import { cartAPI, merchantAPI, productAPI } from "../../../services/backendAPIs";
-import { showAlert } from "../../../constants/common";
+import { showAlert } from "../../../utils/common";
 
 const MerchantPage = () => {
   const { id } = useLocalSearchParams();

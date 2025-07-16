@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { createOrderStyles } from "../../../../assets/styles/order.styles";
 import { Colors } from "../../../../constants/colors";
-import { showAlert } from "../../../../constants/common";
+import { showAlert } from "../../../../utils/common";
 import { useColorScheme } from "../../../../hooks/useColorScheme";
 import { reviewAPI, uploadAPI } from "../../../../services/backendAPIs";
 
