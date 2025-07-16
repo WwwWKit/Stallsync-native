@@ -61,53 +61,39 @@ const CartDetail = () => {
 
   const calculate = () => {
     const subtotalVal = cartItems.reduce(
-      (acc, item) => acc + parseFloat(item.psitmsbt),
+      (acc, item) => acc + parseFloat(item.psitmsbt || 0),
       0
     );
 
+    let pointDisc = applyPoints === "Y" ? userPoints / 100 : 0;
+    if (pointDisc > subtotalVal) pointDisc = subtotalVal;
+
     let rewardDisc = 0;
-    let pointDisc = 0;
-
-    if (applyPoints === "Y") {
-      pointDisc = userPoints / 100;
-      if (pointDisc > subtotalVal) pointDisc = subtotalVal;
-    }
-
-    
     if (applyReward === "Y" && selectedReward) {
-      const reward = selectedReward;
-      if (reward.psrwdtyp === "P") {
-        rewardDisc = subtotalVal * reward.psrwddva;
-        console.log("rewardDisc1", rewardDisc);
-        if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
-          rewardDisc = reward.psrwdcap;
+      const { psrwdtyp, psrwddva, psrwdcap } = selectedReward;
+      const cap = parseFloat(psrwdcap) || 0;
+      const value = parseFloat(psrwddva) || 0;
 
-        console.log("cap",reward.psrwdcap)
-        console.log("rewardDisc2", rewardDisc);
-      } else if (reward.psrwdtyp === "V") {
-        rewardDisc = parseFloat(reward.psrwddva);
-        console.log("va",reward.psrwddva);
-        
-        console.log("rewardDisc3", rewardDisc);
-        if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
-          rewardDisc = reward.psrwdcap;
-        console.log("rewardDisc4", rewardDisc);
+      if (psrwdtyp === "P") {
+        rewardDisc = subtotalVal * value;
+      } else if (psrwdtyp === "V") {
+        rewardDisc = value;
       }
+
+      if (cap > 0 && rewardDisc > cap) rewardDisc = cap;
       if (rewardDisc > subtotalVal - pointDisc)
         rewardDisc = subtotalVal - pointDisc;
-      console.log("rewardDisc5", rewardDisc);
     }
 
-    const discountedSubtotal =
-      parseFloat(subtotalVal) - parseFloat(pointDisc) - parseFloat(rewardDisc);
-    const sstVal = parseFloat(discountedSubtotal) * 0.06;
-    const totalVal = parseFloat(discountedSubtotal) + parseFloat(sstVal);
+    const discountedSubtotal = subtotalVal - pointDisc - rewardDisc;
+    const sstVal = discountedSubtotal * 0.06;
+    const totalVal = discountedSubtotal + sstVal;
 
-    setSubtotal(parseFloat(subtotalVal).toFixed(2));
-    setPointDisc(parseFloat(pointDisc).toFixed(2));
-    setRewardDisc(parseFloat(rewardDisc).toFixed(2));
-    setSst(parseFloat(sstVal).toFixed(2));
-    setTotal(parseFloat(totalVal).toFixed(2));
+    setSubtotal(subtotalVal.toFixed(2));
+    setPointDisc(pointDisc.toFixed(2));
+    setRewardDisc(rewardDisc.toFixed(2));
+    setSst(sstVal.toFixed(2));
+    setTotal(totalVal.toFixed(2));
   };
 
   const fetchCartItem = async () => {
@@ -144,6 +130,10 @@ const CartDetail = () => {
       fetchAvailableReward();
     }
   }, [merchantid]);
+
+  useEffect(() => {
+    console.log("Reward options updated:", rewardOptions);
+  }, [rewardOptions]);
 
   useEffect(() => {
     if (cartItems.length > 0) {
@@ -256,10 +246,10 @@ const CartDetail = () => {
                 </View>
               </View>
               <View>
-              <Text style={cartStyles.subtotal}>RM {item.psitmsbt}</Text>
+                <Text style={cartStyles.subtotal}>RM {item.psitmsbt}</Text>
+              </View>
             </View>
-            </View>
-            
+
             {item.psitmrmk && (
               <Text style={cartStyles.remark}> ** {item.psitmrmk}</Text>
             )}
