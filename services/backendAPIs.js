@@ -381,6 +381,16 @@ export const userAPI = {
       return { error: true };
     }
   },
+  
+  forgetPassword: async (email) => {
+    try {
+      const res = await api.post(`/psusrprf/reset`, email);
+      return res.data;
+    } catch (err) {
+      console.error("Failed to forget password:", err);
+      return { error: true };
+    }
+  }
 };
 
 export const memberAPI = {

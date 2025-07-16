@@ -2,14 +2,14 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useLayoutEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import { Colors } from "../../constants/colors";
@@ -45,16 +45,16 @@ const ForgetPassword = () => {
 
     setLoading(true);
     try {
-      const res = await userAPI.resetPassword({ email });
+      const res = await userAPI.forgetPassword({ email });
       if (res.success) {
-        showAlert("Success", "Check your email for password reset instructions.");
+        showAlert("Success, check your email for password reset instructions.");
         router.replace("/auth/login");
       } else {
-        showAlert("Failed", res.message || "Unable to process request.");
+        showAlert(res.message || "Unable to process request.");
       }
     } catch (error) {
       console.error("Reset error:", error);
-      showAlert("Error", "Something went wrong. Please try again later.");
+      showAlert("Error, something went wrong. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -64,16 +64,16 @@ const ForgetPassword = () => {
     <SafeAreaView style={authStyles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        style={authStyles.keyboardView}
       >
-        <ScrollView contentContainerStyle={authStyles.scrollContainer}>
+        <ScrollView contentContainerStyle={authStyles.scrollContent}>
           <Text style={authStyles.title}>Forgot Your Password?</Text>
           <Text style={authStyles.subtitle}>
             Enter your email address and we'll send you a link to reset your password.
           </Text>
 
           <TextInput
-            style={authStyles.input}
+            style={authStyles.textInput}
             placeholder="Enter your email"
             placeholderTextColor={theme.textPlaceholder}
             value={email}
@@ -84,7 +84,7 @@ const ForgetPassword = () => {
           />
 
           <TouchableOpacity
-            style={authStyles.button}
+            style={authStyles.authButton}
             onPress={handleReset}
             disabled={loading}
           >

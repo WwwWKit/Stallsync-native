@@ -73,19 +73,29 @@ const CartDetail = () => {
       if (pointDisc > subtotalVal) pointDisc = subtotalVal;
     }
 
+    
     if (applyReward === "Y" && selectedReward) {
       const reward = selectedReward;
       if (reward.psrwdtyp === "P") {
         rewardDisc = subtotalVal * reward.psrwddva;
+        console.log("rewardDisc1", rewardDisc);
         if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
           rewardDisc = reward.psrwdcap;
+
+        console.log("cap",reward.psrwdcap)
+        console.log("rewardDisc2", rewardDisc);
       } else if (reward.psrwdtyp === "V") {
         rewardDisc = parseFloat(reward.psrwddva);
+        console.log("va",reward.psrwddva);
+        
+        console.log("rewardDisc3", rewardDisc);
         if (reward.psrwdcap != 0 && rewardDisc > reward.psrwdcap)
           rewardDisc = reward.psrwdcap;
+        console.log("rewardDisc4", rewardDisc);
       }
       if (rewardDisc > subtotalVal - pointDisc)
         rewardDisc = subtotalVal - pointDisc;
+      console.log("rewardDisc5", rewardDisc);
     }
 
     const discountedSubtotal =

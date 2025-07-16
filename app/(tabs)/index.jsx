@@ -98,7 +98,6 @@ const HomeScreen = () => {
       ...p,
       img: productAPI.fetchImage(p.psprdimg),
     }));
-    console.log("Trending products:", enriched);
     setTrending(enriched);
   };
 

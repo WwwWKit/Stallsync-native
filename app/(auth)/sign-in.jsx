@@ -123,7 +123,7 @@ const SignInScreen = () => {
             </View>
 
             <TouchableOpacity
-            onPress= { router.push("/forgetpw")}
+            onPress= {() => router.push("/(auth)/forgetpw")}
             >
               <Text style={authStyles.forgot}>FORGOT PASSWORD?</Text>
             </TouchableOpacity>

@@ -2,21 +2,22 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import DatePicker from "../../components/DatePicker";
 import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
 import { memberAPI } from "../../services/backendAPIs";
+import { showAlert } from "../../utils/common";
 
 const ProfileSetting = () => {
   const navigation = useNavigation();
@@ -86,19 +87,17 @@ const ProfileSetting = () => {
       psmbrphn: phone,
       psmbrdob: birthday,
     };
-    await memberAPI.updateMember(payload);
-
-    const updated = {
-      ...originalProfile,
-      email,
-      name,
-      phone,
-      birthday,
-    };
-
-    setOriginalProfile(updated);
-    setEditable(false);
-    setShowModal(false);
+    try {
+      await memberAPI.updateMember(payload);
+      showAlert("Success, profile updated successfully.");
+      router.replace("/profile");
+    } catch (err) {
+      console.error("Update error:", err);
+      showAlert("Error, failed to update profile. Please try again.");
+    } finally {
+      setEditable(false);
+      setShowModal(false);
+    }
   };
 
   const discardChanges = () => {
