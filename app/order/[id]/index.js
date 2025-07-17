@@ -12,13 +12,13 @@ import {
 import { createCartStyles } from "../../../assets/styles/cart.styles";
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
-import { getReturnUrl, showAlert } from "../../../utils/common";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import {
   orderAPI,
   reviewAPI,
   transactionAPI,
 } from "../../../services/backendAPIs";
+import { getReturnUrl, showAlert } from "../../../utils/common";
 
 const OrderDetail = () => {
   const { id } = useLocalSearchParams();
@@ -162,16 +162,16 @@ const OrderDetail = () => {
         ))}
       </ScrollView>
       <View style={cartStyles.contentContainer}>
-        <View style={cartStyles.rowContainer}>
+        <View style={cartStyles.rowContainer3}>
           <Text style={cartStyles.total}>Subtotal :</Text>
           <Text style={cartStyles.total}>{order.psordamt}</Text>
         </View>
-        <View style={cartStyles.rowContainer}>
+        <View style={cartStyles.rowContainer3}>
           <Text style={cartStyles.total}>SST (6%) :</Text>
           <Text style={cartStyles.total}>{order.psordsst}</Text>
         </View>
         <View style={cartStyles.separator}></View>
-        <View style={cartStyles.rowContainer}>
+        <View style={cartStyles.spacebetween}>
           <Text style={cartStyles.gtotal}>TOTAL :</Text>
           <Text style={cartStyles.gtotal}>{gtotal}</Text>
         </View>

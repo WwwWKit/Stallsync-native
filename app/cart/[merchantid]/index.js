@@ -82,7 +82,7 @@ const CartDetail = () => {
 
       if (cap > 0 && rewardDisc > cap) rewardDisc = cap;
       if (rewardDisc > subtotalVal - pointDisc)
-        rewardDisc = subtotalVal - pointDisc;
+        pointDisc = subtotalVal - rewardDisc;
     }
 
     const discountedSubtotal = subtotalVal - pointDisc - rewardDisc;
@@ -164,7 +164,7 @@ const CartDetail = () => {
 
   const createOrder = async () => {
     const orderPayload = {
-      psordrap: applyReward,
+      psordrap: applyReward === "Y" && selectedReward ? "Y" : "N",
       psordpap: applyPoints,
       psrwduid: selectedReward?.psrwduid || "",
       psmrcuid: merchantid,
@@ -277,34 +277,42 @@ const CartDetail = () => {
         </View>
 
         {applyReward === "Y" && (
-          <ScrollView horizontal>
-            {filteredRewardOptions.map((reward) => (
-              <TouchableOpacity
-                key={reward.psrwduid}
-                style={[
-                  cartStyles.rewardButton,
-                  {
-                    backgroundColor:
-                      selectedReward?.psrwduid === reward.psrwduid
-                        ? theme.primary
-                        : theme.greyBackground,
-                  },
-                ]}
-                onPress={() => setSelectedReward(reward)}
-              >
-                <Text
-                  style={{
-                    color:
-                      selectedReward?.psrwduid === reward.psrwduid
-                        ? theme.white
-                        : theme.text,
-                  }}
-                >
-                  {reward.psrwdnme}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <View>
+            {filteredRewardOptions.length === 0 ? (
+              <Text style={cartStyles.loading}>
+                No available rewards
+              </Text>
+            ) : (
+              <ScrollView horizontal>
+                {filteredRewardOptions.map((reward) => (
+                  <TouchableOpacity
+                    key={reward.psrwduid}
+                    style={[
+                      cartStyles.rewardButton,
+                      {
+                        backgroundColor:
+                          selectedReward?.psrwduid === reward.psrwduid
+                            ? theme.primary
+                            : theme.greyBackground,
+                      },
+                    ]}
+                    onPress={() => setSelectedReward(reward)}
+                  >
+                    <Text
+                      style={{
+                        color:
+                          selectedReward?.psrwduid === reward.psrwduid
+                            ? theme.white
+                            : theme.text,
+                      }}
+                    >
+                      {reward.psrwdnme}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+          </View>
         )}
       </View>
 

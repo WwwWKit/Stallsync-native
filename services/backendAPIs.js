@@ -368,6 +368,16 @@ export const userAPI = {
     }
   },
 
+  deleteUser: async (id) => {
+    try {
+      const res = await api.post(`/psusrprf/rollback`, {id: id});
+      return res.data;
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      return { error: true };
+    }
+  },
+
   changePassword: async (oldPassword, newPassword, conPassword) => {
     try {
       const res = await api.post(`/psusrprf/change_password`, {
@@ -390,7 +400,27 @@ export const userAPI = {
       console.error("Failed to forget password:", err);
       return { error: true };
     }
+  },
+
+  getUserByUsername: async (username) => {
+  try {
+    const res = await api.post(`/psusrprf/checkUsername`, { username });
+    return res.data.message;
+  } catch (err) {
+    console.error("Username check failed:", err);
+    return { exists: false };
   }
+},
+
+  getUserByEmail: async (email) => {
+    try {
+    return res.data;
+  } catch (err) {
+    console.error("Username check failed:", err);
+    return { exists: false };
+  }
+}
+
 };
 
 export const memberAPI = {

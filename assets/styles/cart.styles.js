@@ -11,6 +11,23 @@ export const createCartStyles = (theme = "light") => {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
+      color: color.text,
+      paddingVertical: 8
+    },
+    container: {
+      flex: 1,
+      backgroundColor: color.listBackground,
+      paddingTop: StatusBar.currentHeight,
+    },
+    scrollContainer: {
+      margin: 8,
+      padding: 16,
+      borderRadius: 10,
+    },
+    card: {
+      padding: 10,
+      backgroundColor: color.background,
+      borderRadius: 10,
     },
     container: {
       flex: 1,

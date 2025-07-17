@@ -129,9 +129,9 @@ const SignInScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity onPress={() => router.replace("/")}>
+          {/* <TouchableOpacity onPress={() => router.replace("/")}>
             <Text style={authStyles.guestText}>login in as guest</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={[
               authStyles.authButton,

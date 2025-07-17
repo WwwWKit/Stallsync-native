@@ -274,5 +274,8 @@ export const createAuthStyles = (theme = "light") => {
       marginTop: 20,
       marginBottom: 30,
     },
+
+    errorBorder: { borderColor: "red", borderWidth: 1 },
+    errorText: { color: "red", marginTop: 4 },
   });
 };
