@@ -254,7 +254,12 @@ const CartDetail = () => {
     }
   };
 
-
+  const handleOfflineCheckout = () => {
+    router.replace({
+      pathname: "/checkout/offline",
+      params: { merchantid, total },
+    });
+  };
 
   if (loading)
     return (
@@ -471,14 +476,6 @@ const CartDetail = () => {
           <TouchableOpacity
             onPress={() => {
               setModalVisible(false);
-              handleOfflineCheckout();
-            }}
-          >
-            <Text style={cartStyles.modalText}>Pay at Counter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setModalVisible(false);
               router.replace({
                 pathname: "/checkout/offline",
                 params: {
@@ -489,6 +486,14 @@ const CartDetail = () => {
                   total,
                 },
               });
+            }}
+          >
+            <Text style={cartStyles.modalText}>Pay at Counter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setModalVisible(false);
+              handleOnlineCheckout();
             }}
           >
             <Text style={cartStyles.modalText}>Online Payment</Text>
