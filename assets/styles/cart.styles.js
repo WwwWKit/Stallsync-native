@@ -14,6 +14,43 @@ export const createCartStyles = (theme = "light") => {
       color: color.text,
       paddingVertical: 8
     },
+    input: {
+      borderWidth: 1,
+      padding: 5,
+      marginTop: 5,
+      borderRadius: 5,
+      borderColor: "#ccc",
+      width: 100,
+    },
+    updateBtn: {
+      color: "green",
+      fontWeight: "bold",
+      marginRight: 10,
+    },
+    removeBtn: {
+      color: "red",
+      fontWeight: "bold",
+    },
+    qtyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginTop: 5,
+    },
+    qtyText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      minWidth: 30,
+      textAlign: "center",
+    },
+    iconRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 15,
+      marginTop: 8,
+    }
+    ,
     container: {
       flex: 1,
       backgroundColor: color.listBackground,
@@ -100,7 +137,7 @@ export const createCartStyles = (theme = "light") => {
       marginRight: 16,
       borderRadius: 8,
     },
-    flex:{ flex: 1},
+    flex: { flex: 1 },
     flexstart: {
       flexDirection: "row",
       justifyContent: "flex-start",

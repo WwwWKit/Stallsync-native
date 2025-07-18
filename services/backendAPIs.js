@@ -180,7 +180,7 @@ export const cartAPI = {
 
   updateCartItem: async (payload) => {
     try {
-      const res = await api.put(`/psmbrcrt/update`, payload);
+      const res = await api.post(`/psmbrcrt/update`, payload);
       return res.data;
     } catch (err) {
       console.log("Error in update cart item:", err);
@@ -191,9 +191,7 @@ export const cartAPI = {
 
   deleteCartItem: async (id) => {
   try {
-    const res = await api.delete('/psmbrcrt/delete', {
-      data: { id },
-    });
+    const res = await api.post('/psmbrcrt/delete', id);
 
     return res.data;
   } catch (error) {

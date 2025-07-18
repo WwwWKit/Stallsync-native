@@ -1,7 +1,9 @@
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useLayoutEffect, useState } from "react";
+
 import {
   ActivityIndicator,
   Image,
@@ -9,6 +11,7 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
@@ -95,6 +98,53 @@ const CartDetail = () => {
     setSst(sstVal.toFixed(2));
     setTotal(totalVal.toFixed(2));
   };
+
+  const [editableItems, setEditableItems] = useState({});
+
+
+  const handleItemChange = (itemId, field, value) => {
+    setEditableItems((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        [field]: value,
+      },
+    }));
+  };
+
+
+  const handleUpdateItem = async (itemId, item) => {
+    const changes = editableItems[itemId];
+    if (!changes) return;
+
+    const payload = {
+      psmbrcar: item.psmbrcar,
+      psitmcno: itemId,
+      psmrcuid: merchantid,
+      psprduid: item.psprduid,
+      psitmqty: changes.psitmqty || item.psitmqty,
+      psitmrmk: changes.psitmrmk !== undefined ? changes.psitmrmk : item.psitmrmk,
+    };
+
+    try {
+      await cartAPI.updateCartItem(payload); // assuming wrapper function
+      fetchCartItem(); // refresh data
+    } catch (err) {
+      console.error("Update failed", err);
+      showAlert("Update Failed", "Could not update the item.");
+    }
+  };
+
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await cartAPI.deleteCartItem({ id: itemId }); // assuming wrapper function
+      fetchCartItem(); // refresh data
+    } catch (err) {
+      console.error("Delete failed", err);
+      showAlert("Remove Failed", "Could not remove the item.");
+    }
+  };
+
 
   const fetchCartItem = async () => {
     try {
@@ -195,9 +245,9 @@ const CartDetail = () => {
       Platform.OS === "web"
         ? (window.location.href = trxRes.url)
         : await WebBrowser.openAuthSessionAsync(
-            trxRes.url,
-            getReturnUrl() + "/checkout"
-          );
+          trxRes.url,
+          getReturnUrl() + "/checkout"
+        );
     } catch (e) {
       console.error(e);
       showAlert("Checkout Error", e.message);
@@ -234,15 +284,42 @@ const CartDetail = () => {
           <View key={item.psitmcno}>
             <View style={cartStyles.spacebetween}>
               <View style={cartStyles.flexstart}>
-                <Image
-                  source={{ uri: item.image }}
-                  style={cartStyles.productImage}
-                  resizeMode="cover"
-                />
+                <Image source={{ uri: item.image }} style={cartStyles.productImage} resizeMode="cover" />
                 <View>
                   <Text style={cartStyles.name}>{item.product.psprdnme}</Text>
                   <Text style={cartStyles.price}>RM {item.psitmunt}</Text>
-                  <Text style={cartStyles.quantity}>Qty: {item.psitmqty}</Text>
+                  <View style={cartStyles.qtyRow}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        const current = parseInt(editableItems[item.psitmcno]?.psitmqty || item.psitmqty);
+                        if (current > 1) {
+                          handleItemChange(item.psitmcno, "psitmqty", String(current - 1));
+                        }
+                      }}
+                    >
+                      <Feather name="minus-circle" size={24} color={theme.primary} />
+                    </TouchableOpacity>
+
+                    <Text style={cartStyles.qtyText}>
+                      {editableItems[item.psitmcno]?.psitmqty || item.psitmqty}
+                    </Text>
+
+                    <TouchableOpacity
+                      onPress={() => {
+                        const current = parseInt(editableItems[item.psitmcno]?.psitmqty || item.psitmqty);
+                        handleItemChange(item.psitmcno, "psitmqty", String(current + 1));
+                      }}
+                    >
+                      <Feather name="plus-circle" size={24} color={theme.primary} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <TextInput
+                    style={cartStyles.input}
+                    placeholder="Remark"
+                    value={editableItems[item.psitmcno]?.psitmrmk ?? item.psitmrmk ?? ""}
+                    onChangeText={(text) => handleItemChange(item.psitmcno, "psitmrmk", text)}
+                  />
                 </View>
               </View>
               <View>
@@ -250,11 +327,18 @@ const CartDetail = () => {
               </View>
             </View>
 
-            {item.psitmrmk && (
-              <Text style={cartStyles.remark}> ** {item.psitmrmk}</Text>
-            )}
+            <View style={cartStyles.iconRow}>
+              <TouchableOpacity onPress={() => handleUpdateItem(item.psitmcno, item)}>
+                <Feather name="check-circle" size={24} color="green" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
+                <MaterialIcons name="delete" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+
             <View style={cartStyles.separator} />
           </View>
+
         ))}
 
         <TouchableOpacity
