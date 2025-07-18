@@ -34,6 +34,7 @@ const ProfileSetting = () => {
   const [phonePre, setPhonePre] = useState("+60");
   const [birthday, setBirthday] = useState("");
 
+  const [errors, setErrors] = useState({});
   const [originalProfile, setOriginalProfile] = useState({
     email: "",
     name: "",
@@ -72,11 +73,35 @@ const ProfileSetting = () => {
     fetchData();
   }, []);
 
+  const validateProfile = () => {
+    const newErrors = {};
+    const today = new Date();
+
+    if (!email) newErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) newErrors.email = "Invalid email format";
+
+    if (!name) newErrors.name = "Name is required";
+
+    if (!phone) newErrors.phone = "Phone number is required";
+    else if (!/^\d{9,10}$/.test(phone)) newErrors.phone = "Phone must be 9 or 10 digits";
+
+    if (!birthday) newErrors.birthday = "Date of birth is required";
+    else if (new Date(birthday).getTime() > today.getTime()) {
+      newErrors.birthday = "Cannot be future date";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleEditToggle = () => {
     if (!editable) {
       setEditable(true);
     } else {
-      setShowModal(true);
+      const isValid = validateProfile();
+      if (isValid) {
+        setShowModal(true);
+      }
     }
   };
 
@@ -107,6 +132,7 @@ const ProfileSetting = () => {
     setBirthday(originalProfile.birthday);
     setEditable(false);
     setShowModal(false);
+    setErrors({});
   };
 
   return (
@@ -119,37 +145,63 @@ const ProfileSetting = () => {
           style={authStyles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          <View>
+          {/* Email */}
+          <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Email</Text>
             <TextInput
-              style={authStyles.textInput}
+              style={[
+                authStyles.textInput,
+                editable && errors.email && authStyles.errorBorder,
+              ]}
               placeholder="Enter Email"
               value={email}
               editable={editable}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
               returnKeyType="next"
             />
+            {editable && errors.email && (
+              <Text style={authStyles.errorText}>{errors.email}</Text>
+            )}
           </View>
 
+          {/* Name */}
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Name</Text>
             <TextInput
-              style={authStyles.textInput}
+              style={[
+                authStyles.textInput,
+                editable && errors.name && authStyles.errorBorder,
+              ]}
               placeholder="Enter Name"
               value={name}
               editable={editable}
-              onChangeText={setName}
+              onChangeText={(text) => {
+                setName(text);
+                if (errors.name) setErrors((prev) => ({ ...prev, name: null }));
+              }}
               keyboardType="default"
               autoCapitalize="words"
               returnKeyType="next"
             />
+            {editable && errors.name && (
+              <Text style={authStyles.errorText}>{errors.name}</Text>
+            )}
           </View>
 
+          {/* Phone */}
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Phone Number</Text>
-            <View style={authStyles.phoneInput}>
+            <View
+              style={[
+                authStyles.phoneInput,
+                editable && errors.phone && authStyles.errorBorder,
+              ]}
+            >
               <TouchableOpacity style={authStyles.phonePrefix} disabled>
                 <Text style={authStyles.prefixText}>{phonePre}</Text>
               </TouchableOpacity>
@@ -158,22 +210,38 @@ const ProfileSetting = () => {
                 placeholder="Phone Number"
                 value={phone}
                 editable={editable}
-                onChangeText={setPhone}
+                onChangeText={(text) => {
+                  setPhone(text);
+                  if (errors.phone) setErrors((prev) => ({ ...prev, phone: null }));
+                }}
                 keyboardType="phone-pad"
                 style={{ flex: 1 }}
               />
             </View>
+            {editable && errors.phone && (
+              <Text style={authStyles.errorText}>{errors.phone}</Text>
+            )}
           </View>
 
+          {/* Birthday */}
           <DatePicker
             label="Birthday"
             value={birthday ? new Date(birthday) : null}
-            onChange={(date) => setBirthday(date)}
+            onChange={(date) => {
+              const iso = date.toISOString();
+              setBirthday(iso);
+              if (errors.birthday) setErrors((prev) => ({ ...prev, birthday: null }));
+            }}
             styles={authStyles}
             editable={editable}
+            error={editable ? errors.birthday : null}
           />
+          {editable && errors.birthday && (
+            <Text style={authStyles.errorText}>{errors.birthday}</Text>
+          )}
         </ScrollView>
 
+        {/* Edit / Submit Button */}
         <View style={authStyles.modalContainer}>
           <TouchableOpacity
             style={authStyles.editButton}
@@ -186,6 +254,7 @@ const ProfileSetting = () => {
         </View>
       </KeyboardAvoidingView>
 
+      {/* Confirmation Modal */}
       <Modal visible={showModal} transparent animationType="none">
         <View style={authStyles.modalBackground}>
           <View style={authStyles.dialog}>

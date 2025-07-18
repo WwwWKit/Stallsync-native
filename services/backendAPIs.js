@@ -189,16 +189,6 @@ export const cartAPI = {
     }
   },
 
-  updateCartItem: async (id, quantity) => {
-    try {
-      const res = await api.post(`/psmbrcrt/update?id=${id}&qty=${quantity}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in update cart item:", err);
-      return [];
-    }
-  },
 
   listMerchant: async () => {
     try {
@@ -292,27 +282,7 @@ export const reviewAPI = {
     }
   },
 
-  deleteReview: async (id) => {
-    try {
-      const res = await api.post(`/psordrvw/delete?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in delete review:", err);
-      return [];
-    }
-  },
-
-  updateReview: async (id, rating) => {
-    try {
-      const res = await api.post(`/psordrvw/update?id=${id}&rating=${rating}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in update review:", err);
-      return [];
-    }
-  },
+ 
 };
 
 export const transactionAPI = {
@@ -411,16 +381,6 @@ export const userAPI = {
     return { exists: false };
   }
 },
-
-  getUserByEmail: async (email) => {
-    try {
-    return res.data;
-  } catch (err) {
-    console.error("Username check failed:", err);
-    return { exists: false };
-  }
-}
-
 };
 
 export const memberAPI = {
@@ -479,16 +439,6 @@ export const rewardAPI = {
 
   },
 
-  createReward: async (id) => {
-    try {
-      const res = await api.post(`/psvchrpar/create?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
-    } catch (err) {
-      console.log("Error in create voucher:", err);
-      return [];
-    }
-  },
 };
 
 export const uploadAPI = {

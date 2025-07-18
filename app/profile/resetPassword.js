@@ -2,15 +2,15 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useLayoutEffect, useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { createAuthStyles } from "../../assets/styles/auth.styles";
 import { Colors } from "../../constants/colors";
@@ -30,6 +30,8 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  const [errors, setErrors] = useState({});
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Reset Password",
@@ -40,40 +42,51 @@ const ResetPassword = () => {
     });
   }, [navigation]);
 
-  const validatationCheck = async () => {
-    if (oldPassword === "") {
-      showAlert("Please enter old password.");
-      return;
+  const handleValidation = () => {
+    const newErrors = {};
+
+    if (!oldPassword.trim()) {
+      newErrors.oldPassword = "Please enter old password.";
     }
 
-    if (newPassword === "") {
-      showAlert("Please enter new password.");
-      return;   
+    if (!newPassword.trim()) {
+      newErrors.newPassword = "Please enter new password.";
+    } else if (newPassword.length < 6 || newPassword.length > 20) {
+      newErrors.newPassword = "Password must be 6 to 20 characters.";
     }
 
-    if (confirmPassword === "") {
-      showAlert("Please confirm new password.");
-      return;
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = "Please confirm new password.";
+    } else if (confirmPassword !== newPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
     }
 
+    setErrors(newErrors);
 
-    setShowModal(true);
-  }
+    if (Object.keys(newErrors).length === 0) {
+      setShowModal(true);
+    }
+  };
 
   const confirmChanges = async () => {
-    
+    const newErrors = {};
 
-    const res = await userAPI.changePassword(oldPassword, newPassword, confirmPassword);
+    const res = await userAPI.changePassword(
+      oldPassword,
+      newPassword,
+      confirmPassword
+    );
     setShowModal(false);
 
     if (res?.error) {
-      showAlert(res.message || "Failed to change password.");
+      showAlert("Old password is incorrect.");
+      newErrors.oldPassword = "Please enter correct old password.";
+      setErrors(newErrors);
     } else {
-      showAlert("Password changed successfully.");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      router.back(); 
+      router.replace("/profile");
     }
   };
 
@@ -91,48 +104,79 @@ const ResetPassword = () => {
           style={authStyles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          <View>
+          <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Old Password</Text>
             <TextInput
-              style={authStyles.textInput}
+              style={[
+                authStyles.textInput,
+                errors.oldPassword && authStyles.errorBorder,
+              ]}
               placeholder="Enter old password"
               value={oldPassword}
-              onChangeText={setOldPassword}
+              onChangeText={(text) => {
+                setOldPassword(text);
+                if (errors.oldPassword) {
+                  setErrors((prev) => ({ ...prev, oldPassword: null }));
+                }
+              }}
               secureTextEntry
               autoCapitalize="none"
-              returnKeyType="next"
             />
+            {errors.oldPassword && (
+              <Text style={authStyles.errorText}>{errors.oldPassword}</Text>
+            )}
           </View>
 
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>New Password</Text>
             <TextInput
-              style={authStyles.textInput}
+              style={[
+                authStyles.textInput,
+                errors.newPassword && authStyles.errorBorder,
+              ]}
               placeholder="Enter new password"
               value={newPassword}
-              onChangeText={setNewPassword}
+              onChangeText={(text) => {
+                setNewPassword(text);
+                if (errors.newPassword) {
+                  setErrors((prev) => ({ ...prev, newPassword: null }));
+                }
+              }}
               secureTextEntry
               autoCapitalize="none"
-              returnKeyType="next"
             />
+            {errors.newPassword && (
+              <Text style={authStyles.errorText}>{errors.newPassword}</Text>
+            )}
           </View>
 
           <View style={authStyles.inputContainer}>
             <Text style={authStyles.label}>Confirm New Password</Text>
             <TextInput
-              style={authStyles.textInput}
+              style={[
+                authStyles.textInput,
+                errors.confirmPassword && authStyles.errorBorder,
+              ]}
               placeholder="Confirm new password"
               value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                if (errors.confirmPassword) {
+                  setErrors((prev) => ({ ...prev, confirmPassword: null }));
+                }
+              }}
               secureTextEntry
               autoCapitalize="none"
-              returnKeyType="done"
             />
+            {errors.confirmPassword && (
+              <Text style={authStyles.errorText}>{errors.confirmPassword}</Text>
+            )}
           </View>
         </ScrollView>
+
         <TouchableOpacity
           style={authStyles.editButton}
-          onPress={validatationCheck}
+          onPress={handleValidation}
         >
           <Text style={authStyles.editButtonText}>Reset Password</Text>
         </TouchableOpacity>

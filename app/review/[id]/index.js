@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,7 +14,6 @@ import { useColorScheme } from "../../../hooks/useColorScheme";
 
 // Dummy fetch function – Replace this with your real API call
 const fetchReviewById = async (id) => {
-  // Simulate API delay and sample response
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -30,7 +29,6 @@ const fetchReviewById = async (id) => {
 const ReviewPage = () => {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
-  const router = useRouter();
   const scheme = useColorScheme();
   const theme = Colors[scheme];
   const styles = createOrderStyles(scheme);

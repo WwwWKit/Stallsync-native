@@ -52,7 +52,7 @@ const SignInScreen = () => {
     
 
       if (!token) {
-        showAlert("Invalid username or password");
+        showAlert("Invalid username or password.");
         return;
       }
     
@@ -60,8 +60,7 @@ const SignInScreen = () => {
     } catch (error) {
       console.log("Login error:", error);
       showAlert(
-        "Login error",
-        error.response?.data?.message || "An unexpected error occurred."
+        "Please enter valid username and password.",
       );
     } finally {
       setLoading(false);

@@ -46,11 +46,13 @@ const ForgetPassword = () => {
     setLoading(true);
     try {
       const res = await userAPI.forgetPassword({ email });
-      if (res.success) {
+      console.log("Reset link sent to:", res);
+      if (res.result) {
+  
         showAlert("Success, check your email for password reset instructions.");
-        router.replace("/auth/login");
+        router.replace("/(auth)/sign-in");
       } else {
-        showAlert(res.message || "Unable to process request.");
+        showAlert(res.message || "Email not registered.");
       }
     } catch (error) {
       console.error("Reset error:", error);
