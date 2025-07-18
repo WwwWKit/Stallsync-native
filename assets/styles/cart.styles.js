@@ -20,7 +20,7 @@ export const createCartStyles = (theme = "light") => {
       marginTop: 5,
       borderRadius: 5,
       borderColor: "#ccc",
-      width: 100,
+  
     },
     updateBtn: {
       color: "green",
