@@ -178,16 +178,29 @@ export const cartAPI = {
     }
   },
 
-  deleteCartItem: async (id) => {
+  updateCartItem: async (payload) => {
     try {
-      const res = await api.post(`/psmbrcrt/delete?id=${id}`);
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.put(`/psmbrcrt/update`, payload);
+      return res.data;
     } catch (err) {
-      console.log("Error in delete cart item:", err);
+      console.log("Error in update cart item:", err);
       return [];
     }
   },
+
+
+  deleteCartItem: async (id) => {
+  try {
+    const res = await api.delete('/psmbrcrt/delete', {
+      data: { id },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error('Delete Cart Error:', error.response?.data || error.message);
+    return { success: false, error: error.response?.data };
+  }},
+  
 
 
   listMerchant: async () => {
