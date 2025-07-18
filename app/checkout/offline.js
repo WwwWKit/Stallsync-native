@@ -1,17 +1,25 @@
-// app/checkout/success.js
 import { useNavigation } from "@react-navigation/native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
 import { SafeAreaView, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../../constants/colors";
 import { useColorScheme } from "../../hooks/useColorScheme";
-import { orderAPI, transactionAPI } from "./../../services/backendAPIs";
+import { orderAPI, transactionAPI } from "../../services/backendAPIs";
+import { showAlert } from "../../utils/common";
 
 export default function CheckoutOffline() {
   const router = useRouter();
   const navigation = useNavigation();
   const scheme = useColorScheme();
   const theme = Colors[scheme];
+
+  const {
+    merchantid,
+    applyPoints,
+    applyReward,
+    psrwduid,
+    total,
+  } = useLocalSearchParams();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -25,9 +33,10 @@ export default function CheckoutOffline() {
 
   const createOrder = async () => {
     const orderPayload = {
-      psordrap: "N",
-      psordpap: "N",
+      psordrap: applyReward === "Y" && psrwduid ? "Y" : "N",
+      psordpap: applyPoints === "Y" ? "Y" : "N",
       psmrcuid: merchantid,
+      psrwduid: psrwduid || "",
     };
 
     try {
@@ -49,11 +58,24 @@ export default function CheckoutOffline() {
       return null;
     }
   };
+
   const handleCashPayment = async () => {
     const createdOrdId = await createOrder();
     if (!createdOrdId) return;
 
-    const trxRes = await transactionAPI.createOffline(createdOrdId, total);
+    try {
+      const trxRes = await transactionAPI.createOffline(
+        createdOrdId,
+        total
+      );
+      router.replace("/checkout/success"); // or redirect to another success page
+    } catch (error) {
+      console.error("Offline transaction failed:", error);
+      showAlert(
+        "Transaction Failed",
+        "Something went wrong processing the cash payment."
+      );
+    }
   };
 
   return (
@@ -96,7 +118,7 @@ export default function CheckoutOffline() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => router.back("")}
+        onPress={() => router.back()}
         style={{
           borderWidth: 2,
           width: "90%",

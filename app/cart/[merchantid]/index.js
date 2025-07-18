@@ -101,7 +101,6 @@ const CartDetail = () => {
 
   const [editableItems, setEditableItems] = useState({});
 
-
   const handleItemChange = (itemId, field, value) => {
     setEditableItems((prev) => ({
       ...prev,
@@ -111,7 +110,6 @@ const CartDetail = () => {
       },
     }));
   };
-
 
   const handleUpdateItem = async (itemId, item) => {
     const changes = editableItems[itemId];
@@ -123,7 +121,8 @@ const CartDetail = () => {
       psmrcuid: merchantid,
       psprduid: item.psprduid,
       psitmqty: changes.psitmqty || item.psitmqty,
-      psitmrmk: changes.psitmrmk !== undefined ? changes.psitmrmk : item.psitmrmk,
+      psitmrmk:
+        changes.psitmrmk !== undefined ? changes.psitmrmk : item.psitmrmk,
     };
 
     try {
@@ -144,7 +143,6 @@ const CartDetail = () => {
       showAlert("Remove Failed", "Could not remove the item.");
     }
   };
-
 
   const fetchCartItem = async () => {
     try {
@@ -224,7 +222,7 @@ const CartDetail = () => {
       const orderRes = await orderAPI.createOrder(orderPayload);
       if (!orderRes || !orderRes.message?.ordId)
         throw new Error("Invalid order response");
-      return orderRes.message.ordId;
+      return { ordId: orderRes.message.ordId, amt: orderRes.message.amt };
     } catch (error) {
       console.error("Order creation failed:", error);
       showAlert("Order Creation Failed", "Please try again later.");
@@ -237,7 +235,7 @@ const CartDetail = () => {
     try {
       const ordId = await createOrder();
       if (!ordId) throw new Error("Order creation failed");
-      const trxRes = await transactionAPI.createOnline(ordId, total, {
+      const trxRes = await transactionAPI.createOnline(ordId.ordId, ordId.amt, {
         returnUrl: getReturnUrl(),
       });
       if (!trxRes?.url) throw new Error("Transaction failed");
@@ -245,9 +243,9 @@ const CartDetail = () => {
       Platform.OS === "web"
         ? (window.location.href = trxRes.url)
         : await WebBrowser.openAuthSessionAsync(
-          trxRes.url,
-          getReturnUrl() + "/checkout"
-        );
+            trxRes.url,
+            getReturnUrl() + "/checkout"
+          );
     } catch (e) {
       console.error(e);
       showAlert("Checkout Error", e.message);
@@ -256,9 +254,7 @@ const CartDetail = () => {
     }
   };
 
-  const handleOfflineCheckout = () => {
-    router.replace("/checkout/offline");
-  };
+
 
   if (loading)
     return (
@@ -284,20 +280,35 @@ const CartDetail = () => {
           <View key={item.psitmcno}>
             <View style={cartStyles.spacebetween}>
               <View style={cartStyles.flexstart}>
-                <Image source={{ uri: item.image }} style={cartStyles.productImage} resizeMode="cover" />
+                <Image
+                  source={{ uri: item.image }}
+                  style={cartStyles.productImage}
+                  resizeMode="cover"
+                />
                 <View>
                   <Text style={cartStyles.name}>{item.product.psprdnme}</Text>
                   <Text style={cartStyles.price}>RM {item.psitmunt}</Text>
                   <View style={cartStyles.qtyRow}>
                     <TouchableOpacity
                       onPress={() => {
-                        const current = parseInt(editableItems[item.psitmcno]?.psitmqty || item.psitmqty);
+                        const current = parseInt(
+                          editableItems[item.psitmcno]?.psitmqty ||
+                            item.psitmqty
+                        );
                         if (current > 1) {
-                          handleItemChange(item.psitmcno, "psitmqty", String(current - 1));
+                          handleItemChange(
+                            item.psitmcno,
+                            "psitmqty",
+                            String(current - 1)
+                          );
                         }
                       }}
                     >
-                      <Feather name="minus-circle" size={24} color={theme.primary} />
+                      <Feather
+                        name="minus-circle"
+                        size={24}
+                        color={theme.primary}
+                      />
                     </TouchableOpacity>
 
                     <Text style={cartStyles.qtyText}>
@@ -306,19 +317,36 @@ const CartDetail = () => {
 
                     <TouchableOpacity
                       onPress={() => {
-                        const current = parseInt(editableItems[item.psitmcno]?.psitmqty || item.psitmqty);
-                        handleItemChange(item.psitmcno, "psitmqty", String(current + 1));
+                        const current = parseInt(
+                          editableItems[item.psitmcno]?.psitmqty ||
+                            item.psitmqty
+                        );
+                        handleItemChange(
+                          item.psitmcno,
+                          "psitmqty",
+                          String(current + 1)
+                        );
                       }}
                     >
-                      <Feather name="plus-circle" size={24} color={theme.primary} />
+                      <Feather
+                        name="plus-circle"
+                        size={24}
+                        color={theme.primary}
+                      />
                     </TouchableOpacity>
                   </View>
 
                   <TextInput
                     style={cartStyles.input}
                     placeholder="Remark"
-                    value={editableItems[item.psitmcno]?.psitmrmk ?? item.psitmrmk ?? ""}
-                    onChangeText={(text) => handleItemChange(item.psitmcno, "psitmrmk", text)}
+                    value={
+                      editableItems[item.psitmcno]?.psitmrmk ??
+                      item.psitmrmk ??
+                      ""
+                    }
+                    onChangeText={(text) =>
+                      handleItemChange(item.psitmcno, "psitmrmk", text)
+                    }
                   />
                 </View>
               </View>
@@ -328,7 +356,9 @@ const CartDetail = () => {
             </View>
 
             <View style={cartStyles.iconRow}>
-              <TouchableOpacity onPress={() => handleUpdateItem(item.psitmcno, item)}>
+              <TouchableOpacity
+                onPress={() => handleUpdateItem(item.psitmcno, item)}
+              >
                 <Feather name="check-circle" size={24} color="green" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
@@ -338,7 +368,6 @@ const CartDetail = () => {
 
             <View style={cartStyles.separator} />
           </View>
-
         ))}
 
         <TouchableOpacity
@@ -363,9 +392,7 @@ const CartDetail = () => {
         {applyReward === "Y" && (
           <View>
             {filteredRewardOptions.length === 0 ? (
-              <Text style={cartStyles.loading}>
-                No available rewards
-              </Text>
+              <Text style={cartStyles.loading}>No available rewards</Text>
             ) : (
               <ScrollView horizontal>
                 {filteredRewardOptions.map((reward) => (
@@ -452,7 +479,16 @@ const CartDetail = () => {
           <TouchableOpacity
             onPress={() => {
               setModalVisible(false);
-              handleOnlineCheckout();
+              router.replace({
+                pathname: "/checkout/offline",
+                params: {
+                  merchantid,
+                  applyPoints,
+                  applyReward,
+                  psrwduid: selectedReward?.psrwduid || "",
+                  total,
+                },
+              });
             }}
           >
             <Text style={cartStyles.modalText}>Online Payment</Text>
