@@ -33,14 +33,14 @@ export default function RootLayout() {
     <AuthProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <View style={{ flex: 1 }}>
-          <AuthGate>
+          
             <Stack>
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>
             <FloatingCartButton />
-          </AuthGate>
+          
         </View>
         <StatusBar style="auto" />
       </ThemeProvider>

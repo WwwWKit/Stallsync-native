@@ -11,19 +11,13 @@ import {
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
+import { reviewAPI } from "../../../services/backendAPIs";
+
 
 // Dummy fetch function – Replace this with your real API call
 const fetchReviewById = async (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        reviewer: "John Doe",
-        rating: 4.5,
-        description: "Great food and fast service. Will order again!",
-        date: "2025-07-10",
-      });
-    }, 1000);
-  });
+  const res = await reviewAPI.getReview(id); // adjust to your real API shape
+  return res.message; // or res.data depending on your API structure
 };
 
 const ReviewPage = () => {
@@ -64,18 +58,20 @@ const ReviewPage = () => {
           <ActivityIndicator size="large" color={theme.primary} />
         ) : review ? (
           <View>
+           <View>
             <Text style={{ fontSize: 20, fontWeight: "bold", color: theme.text }}>
-              {review.reviewer}
+              Reviewer: {review.crtuser}
             </Text>
             <Text style={{ fontSize: 16, color: theme.text }}>
-              Rating: {review.rating} / 5
+              Rating: {review.psrvwrtg} / 5
             </Text>
             <Text style={{ fontSize: 14, color: theme.text, marginTop: 8 }}>
-              {review.description}
+              {review.psrvwdsc}
             </Text>
             <Text style={{ fontSize: 12, color: theme.gray, marginTop: 8 }}>
-              Date: {review.date}
+              Date: {new Date(review.createdAt).toLocaleDateString()}
             </Text>
+          </View>
           </View>
         ) : (
           <Text style={{ color: theme.text }}>Review not found.</Text>

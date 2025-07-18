@@ -276,7 +276,8 @@ export const reviewAPI = {
   getReview: async (id) => {
     try {
       const res = await api.get(`/psordrvw/detail`, { params: { id } });
-      return res.data.message || null;
+      // console.log("LOL: ", res)
+      return res.data || null;
     } catch (err) {
       console.log("Error in get review:", err);
       return null;
