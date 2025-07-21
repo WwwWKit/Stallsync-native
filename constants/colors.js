@@ -141,7 +141,7 @@ export const Colors = {
     badge: "#42cf76", // green
     text: "#ECEDEE", // white with grey
     background: "#151718", // black
-    tint: tintedGold, // light gold
+    tint: tintedGold, // light goldc
     icon: "#9BA1A6", // grey
     tabIconDefault: "#9BA1A6", // grey
     tabIconSelected: tintedGold, // light gold

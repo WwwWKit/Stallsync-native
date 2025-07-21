@@ -177,7 +177,7 @@ const OrderDetail = () => {
         </View>
         <View style={{ height: 100 }} />
       </View>
-      {["N", "G", "C"].includes(order.psordsts) ? (
+      {["N", "G"].includes(order.psordsts) ? (
         <View
           style={{
             position: "absolute",
