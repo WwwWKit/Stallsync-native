@@ -172,14 +172,13 @@ const ResetPassword = () => {
               <Text style={authStyles.errorText}>{errors.confirmPassword}</Text>
             )}
           </View>
+          <TouchableOpacity
+            style={authStyles.editButton}
+            onPress={handleValidation}
+          >
+            <Text style={authStyles.editButtonText}>Reset Password</Text>
+          </TouchableOpacity>
         </ScrollView>
-
-        <TouchableOpacity
-          style={authStyles.editButton}
-          onPress={handleValidation}
-        >
-          <Text style={authStyles.editButtonText}>Reset Password</Text>
-        </TouchableOpacity>
       </KeyboardAvoidingView>
 
       <Modal visible={showModal} transparent animationType="none">

@@ -10,7 +10,7 @@ const FloatingCartButton = () => {
   const theme = Colors[scheme];
   const pathname = usePathname();
 
-  // Show only on 3 tabs (e.g. /tabs/home, /tabs/discover, /tabs/favorites)
+
   // and merchant pages (/merchant/[id])
   const showOnTabs = ["/", "/merchant", "/category"];
   const isMerchantPage = pathname?.startsWith("/merchant");

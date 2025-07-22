@@ -239,10 +239,9 @@ const ProfileSetting = () => {
           {editable && errors.birthday && (
             <Text style={authStyles.errorText}>{errors.birthday}</Text>
           )}
-        </ScrollView>
 
-        {/* Edit / Submit Button */}
-        <View style={authStyles.modalContainer}>
+           {/* Edit / Submit Button */}
+        <View >
           <TouchableOpacity
             style={authStyles.editButton}
             onPress={handleEditToggle}
@@ -252,6 +251,9 @@ const ProfileSetting = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        </ScrollView>
+
+       
       </KeyboardAvoidingView>
 
       {/* Confirmation Modal */}

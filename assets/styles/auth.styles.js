@@ -208,12 +208,12 @@ export const createAuthStyles = (theme = "light") => {
       padding: 16,
     },
     editButton: {
-      width: "90%",
+
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: color.primary,
       borderRadius: 100,
-      margin: 20,
+      marginTop: 40,
       padding: 20,
     },
     editButtonText: {

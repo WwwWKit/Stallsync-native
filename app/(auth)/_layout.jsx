@@ -1,10 +1,20 @@
-import { Stack } from "expo-router"; // ✅ correct import
+import { Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { useColorScheme } from "react-native";
+import { useAuth } from "../../constants/AuthContext"; // assumes your context is here
 import { Colors } from "../../constants/colors";
 
 const AuthLayout = () => {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace("/"); 
+    }
+  }, [isLoggedIn]);
 
   return (
     <Stack
@@ -20,5 +30,6 @@ const AuthLayout = () => {
       <Stack.Screen name="forgetpw" />
     </Stack>
   );
-}
-export default  AuthLayout;
+};
+
+export default AuthLayout;

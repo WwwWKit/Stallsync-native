@@ -9,14 +9,19 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import defaultImage from "../../../assets/images/default.png";
 import { createCategoryStyles } from "../../../assets/styles/category.styles";
 import { createMrcDetailStyles } from "../../../assets/styles/mrcdetail.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
-import { cartAPI, merchantAPI, productAPI } from "../../../services/backendAPIs";
+import {
+  cartAPI,
+  merchantAPI,
+  productAPI,
+  reviewAPI,
+} from "../../../services/backendAPIs";
 import { showAlert } from "../../../utils/common";
 
 const MerchantPage = () => {
@@ -34,7 +39,10 @@ const MerchantPage = () => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-
+  const [tab, setTab] = useState("menu"); // "menu" or "review"
+  const [reviews, setReviews] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   // Set header styles
   useLayoutEffect(() => {
@@ -68,6 +76,12 @@ const MerchantPage = () => {
     }
   }, [typeFilters]);
 
+  useEffect(() => {
+    if (tab === "review" && id) {
+      fetchReviews();
+    }
+  }, [tab]);
+
   const fetchMerchant = async () => {
     try {
       const res = await merchantAPI.getMerchant(id);
@@ -84,27 +98,70 @@ const MerchantPage = () => {
     }
   };
 
+  // const fetchReviews = async () => {
+  //   try {
+  //     const res = await reviewAPI.listReviews(id);
+
+  //     if (res && res.data) {
+  //       setReviews(res.data);
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to load reviews:", err);
+  //   }
+  // };
+
+  const fetchReviews = async (nextPage = 0) => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+    try {
+      const res = await reviewAPI.listReviews(id, {
+        page: nextPage,
+        limit: 10,
+      });
+
+      if (res?.data) {
+        const newReviews = res.data;
+        const total = res.total;
+
+        // Combine with existing ones
+        setReviews((prev) => [...prev, ...newReviews]);
+
+        // Stop loading if all items loaded
+        if ((nextPage + 1) * 10 >= total) {
+          setHasMore(false);
+        } else {
+          setPage(nextPage + 1);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchFilter = async () => {
     try {
       const allProducts = await productAPI.listByMerchant(id); // products by merchant
-
+      console.log(allProducts);
 
       const enrichedProducts = allProducts.map((p) => ({
-      ...p,
-      image: productAPI.fetchImage(p.psprdimg),
-    }));
+        ...p,
+        image: productAPI.fetchImage(p.psprdimg),
+      }));
 
-    setAllProducts(enrichedProducts);
+      setAllProducts(enrichedProducts);
 
       const { types } = await productAPI.getFilter(false, true); // global types
 
       const usedTypeCodes = [
-      ...new Set(allProducts.map((p) => p.psprdtyp).filter(Boolean)), //merchant used types
-    ];
+        ...new Set(allProducts.map((p) => p.psprdtyp).filter(Boolean)), //merchant used types
+      ];
 
       const merchantTypes = types.filter((type) =>
-      usedTypeCodes.includes(type.code)
-    );
+        usedTypeCodes.includes(type.code)
+      );
 
       const formattedTypes = merchantTypes.map((typ, idx) => ({
         id: idx,
@@ -129,8 +186,6 @@ const MerchantPage = () => {
     const filtered = allProducts.filter((p) => p.psprdtyp === code);
     setFilteredProducts(filtered);
   };
-
-
 
   const addCart = async (cartItem) => {
     try {
@@ -190,105 +245,228 @@ const MerchantPage = () => {
           {merchant.psmrcdsc}
         </Text>
 
-        {/* Type Filters */}
-        <View style={categoryStyles.categoryFilterContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={categoryStyles.categoryFilterScrollContent}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginVertical: 12,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setTab("menu")}
+            style={{
+              backgroundColor: tab === "menu" ? theme.primary : "#ccc",
+              paddingVertical: 8,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+              marginHorizontal: 10,
+            }}
           >
-            {typeFilters.length > 0 &&
-              typeFilters.map((filter) => {
-                const isSelected = selectedFilter === filter.code;
-                return (
-                  <TouchableOpacity
-                    key={filter.id}
-                    style={[
-                      categoryStyles.categoryButton,
-                      isSelected && categoryStyles.selectedCategory,
-                    ]}
-                    onPress={() => handleFilterSelected(filter.code)}
-                    activeOpacity={0.7}
-                  >
-                    <Text
-                      style={[
-                        categoryStyles.categoryText,
-                        isSelected && categoryStyles.selectedCategoryText,
-                      ]}
-                    >
-                      {filter.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-          </ScrollView>
+            <Text style={{ color: tab === "menu" ? "white" : "black" }}>
+              Menu
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setTab("review")}
+            style={{
+              backgroundColor: tab === "review" ? theme.primary : "#ccc",
+              paddingVertical: 8,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+              marginHorizontal: 10,
+            }}
+          >
+            <Text style={{ color: tab === "review" ? "white" : "black" }}>
+              Reviews
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Filtered Products */}
-        <View style={{ marginTop: 16 }}>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <TouchableOpacity
-                key={product.psprduid}
-                onPress={() => router.push(`/product/${product.psprduid}`)}
-                style={{
-                  marginBottom: 16,
-                  backgroundColor: "#f9f9f9",
-                  padding: 10,
-                  borderRadius: 10,
-                  position: "relative", // important for absolute positioning inside
-                }}
+        {tab === "menu" ? (
+          <>
+            {/* Type Filters */}
+            <View style={categoryStyles.categoryFilterContainer}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={
+                  categoryStyles.categoryFilterScrollContent
+                }
               >
-                <View>
-                  <Image
-                    source={{ uri: product.image }}
-                    style={{ width: "100%", height: 180, borderRadius: 10 }}
-                    resizeMode="cover"
-                  />{" "}
+                {typeFilters.length > 0 &&
+                  typeFilters.map((filter) => {
+                    const isSelected = selectedFilter === filter.code;
+                    return (
+                      <TouchableOpacity
+                        key={filter.id}
+                        style={[
+                          categoryStyles.categoryButton,
+                          isSelected && categoryStyles.selectedCategory,
+                        ]}
+                        onPress={() => handleFilterSelected(filter.code)}
+                        activeOpacity={0.7}
+                      >
+                        <Text
+                          style={[
+                            categoryStyles.categoryText,
+                            isSelected && categoryStyles.selectedCategoryText,
+                          ]}
+                        >
+                          {filter.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+              </ScrollView>
+            </View>
+
+            {/* Filtered Products */}
+            <View style={{ marginTop: 16 }}>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
                   <TouchableOpacity
-                    onPress={() =>
-                      addCart({
-                        psmrcuid: product.psmrcuid,
-                        psprduid: product.psprduid,
-                        psitmqty: 1,
-                        psitmrmk: null,
-                      })
-                    }
+                    key={product.psprduid}
+                    onPress={() => router.push(`/product/${product.psprduid}`)}
                     style={{
-                      position: "absolute",
-                      bottom: 20,
-                      right: 20,
-                      backgroundColor: theme.primary,
-                      borderRadius: 30,
-                      alignItems: "center",
-                      justifyContent: "center",
+                      marginBottom: 16,
+                      backgroundColor: "#f9f9f9",
+                      padding: 10,
+                      borderRadius: 10,
+                      position: "relative", // important for absolute positioning inside
                     }}
                   >
-                    <Ionicons
-                      name={"add"}
-                      size={20}
-                      color={theme.white}
-                      style={{ padding: 15 }}
-                    />
-                  </TouchableOpacity>
-                </View>
+                    <View>
+                      <Image
+                        source={{ uri: product.image }}
+                        style={{ width: "100%", height: 180, borderRadius: 10 }}
+                        resizeMode="cover"
+                      />{" "}
+                    </View>
 
+                    <Text
+                      style={{ fontSize: 18, fontWeight: "bold", marginTop: 8 }}
+                    >
+                      {product.psprdnme}
+                    </Text>
+                    <Text style={{ color: "#666", marginTop: 4 }}>
+                      {product.psprddsc}
+                    </Text>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        margin: 8,
+                        marginBottom: 2,
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 24,
+                          fontWeight: "bold",
+                          alignSelf: "center",
+                        }}
+                      >
+                        RM {product.psprdpri}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          addCart({
+                            psmrcuid: product.psmrcuid,
+                            psprduid: product.psprduid,
+                            psitmqty: 1,
+                            psitmrmk: null,
+                          })
+                        }
+                        style={{
+                          backgroundColor: theme.primary,
+                          borderRadius: 30,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name={"add"}
+                          size={20}
+                          color={theme.white}
+                          style={{ padding: 15 }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableOpacity>
+                ))
+              ) : (
                 <Text
-                  style={{ fontSize: 18, fontWeight: "bold", marginTop: 8 }}
+                  style={{ marginTop: 16, textAlign: "center", color: "#999" }}
                 >
-                  {product.psprdnme}
+                  No products found.
                 </Text>
-                <Text style={{ color: "#666", marginTop: 4 }}>
-                  {product.psprddsc}
-                </Text>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text style={{ marginTop: 16, textAlign: "center", color: "#999" }}>
-              No products found.
-            </Text>
-          )}
-        </View>
+              )}
+            </View>
+          </>
+        ) : (
+          <View style={{ marginTop: 16 }}>
+            {reviews.length > 0 ? (
+              reviews.map((review, index) => (
+                <View
+                  key={index}
+                  style={{
+                    backgroundColor: "#fff",
+                    marginBottom: 12,
+                    padding: 12,
+                    borderRadius: 10,
+                    borderColor: "#eee",
+                    borderWidth: 1,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 1,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <FontAwesome5 name="star" size={16} color="#f1c40f" />
+                    <Text style={{ fontWeight: "bold", marginLeft: 6 }}>
+                      {review.psrvwrtg}/5
+                    </Text>
+                  </View>
+                  <Text style={{ fontWeight: "bold" }}>{review.crtuser}</Text>
+                  <Text style={{ color: "#333", marginBottom: 6 }}>
+                    {review.psrvwdsc}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: "#888" }}>
+                    {review.updatedAt}
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text style={{ textAlign: "center", color: "#888" }}>
+                No reviews yet.
+              </Text>
+            )}
+            {reviews.length > 0 ? (
+            <TouchableOpacity
+                  onPress={() => fetchReviews(page)}
+                  disabled={!hasMore || loading}
+                >
+                  <Text style={{ textAlign: "center", padding: 10 }}>
+                    {loading
+                      ? "Loading..."
+                      : hasMore
+                      ? "Load more"
+                      : "No more reviews"}
+                  </Text>
+                </TouchableOpacity>
+            ): null
+            }
+            
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

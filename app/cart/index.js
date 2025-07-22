@@ -1,6 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -35,9 +35,11 @@ const CartOverview = () => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    fetchMerchants();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchMerchants();
+    }, [])
+  );
 
   const fetchMerchants = async () => {
     try {

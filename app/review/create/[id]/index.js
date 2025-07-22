@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import { createOrderStyles } from "../../../../assets/styles/order.styles";
 import { Colors } from "../../../../constants/colors";
-import { showAlert } from "../../../../utils/common";
 import { useColorScheme } from "../../../../hooks/useColorScheme";
 import { reviewAPI } from "../../../../services/backendAPIs";
+import { showAlert } from "../../../../utils/common";
 
 const createReview = () => {
   const { id } = useLocalSearchParams();
@@ -41,7 +41,11 @@ const createReview = () => {
 
   const renderStars = () =>
     [1, 2, 3, 4, 5].map((star) => (
-      <TouchableOpacity key={star} onPress={() => setRating(star)} style={{ marginHorizontal: 4 }}>
+      <TouchableOpacity
+        key={star}
+        onPress={() => setRating(star)}
+        style={{ marginHorizontal: 8 }}
+      >
         <Ionicons
           name={rating >= star ? "star" : "star-outline"}
           size={32}
@@ -83,23 +87,54 @@ const createReview = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={[styles.title, { marginBottom: 20 }]}>Rate your order</Text>
-        <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 20 }}>
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.text,
+            marginTop: 16,
+          }}
+        >
+          Rate your order:
+        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginVertical: 20,
+          }}
+        >
           {renderStars()}
         </View>
-
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.text,
+            marginTop: 16,
+          }}
+        >
+          Description:
+        </Text>
         <TextInput
           placeholder="Write your review here..."
           multiline
           numberOfLines={4}
           value={description}
           onChangeText={setDescription}
-          style={[styles.input, { height: 120, textAlignVertical: "top" }]}
+          style={{
+            borderColor: theme.border,
+            borderWidth: 1,
+            padding: 8,
+            height: 100,
+            marginTop: 4,
+            color: theme.text,
+            textAlignVertical: "top",
+          }}
         />
 
         <TouchableOpacity
           style={{
-            width: "90%",
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: theme.primary,
@@ -113,7 +148,9 @@ const createReview = () => {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}>
+            <Text
+              style={{ color: theme.text, fontSize: 20, fontWeight: "600" }}
+            >
               Submit Review
             </Text>
           )}

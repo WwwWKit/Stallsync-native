@@ -87,13 +87,14 @@ export const createProfileStyles = (theme = "light") => {
       backgroundColor: color.background,
       borderRadius: 12,
       paddingVertical: 12,
-      paddingHorizontal: 16,
+      paddingHorizontal: 22,
     },
     settingItem: {
       paddingVertical: 14,
     },
     settingText: {
-      fontSize: 16,
+      fontSize: 22,
+      fontWeight: "600"
     },
     logoutText: {
       color: "red",

@@ -260,13 +260,10 @@ export const orderAPI = {
 //export const orderItemAPI = {};
 
 export const reviewAPI = {
-  listReviews: async (query) => {
+  listReviews: async (id, { page = 0, limit = 10 } = {}) => {
     try {
-      const res = await api.get(
-        `/psordrvw/list?s=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
-      return data.merchant || [];
+      const res = await api.get(`/psordrvw/list_m`, { params: { id, page, limit } });
+      return res.data.message || [];
     } catch (err) {
       console.log("Error in list reviews:", err);
       return [];
@@ -294,6 +291,11 @@ export const reviewAPI = {
     }
   },
 
+   updateReview: async (data) => {
+    const res = await api.post(`/psordrvw/update`, data);
+    console.log("Review updated:", res.data);
+    return res.data;
+  },
  
 };
 

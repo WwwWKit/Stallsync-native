@@ -2,11 +2,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useLayoutEffect } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { createProfileStyles } from "../../assets/styles/profile.styles";
 import { Colors } from "../../constants/colors";
@@ -49,7 +49,7 @@ export default function PrivacySetting() {
             onPress={() => handleSettingPress(item)}
           >
             <Text style={profileStyles.settingText}>{item}</Text>
-            {i < arr.length - 1 && <View style={profileStyles.separator} />}
+            {i < arr.length  && <View style={profileStyles.separator} />}
           </TouchableOpacity>
         ))}
       </ScrollView>

@@ -102,32 +102,61 @@ const CartDetail = () => {
   const [editableItems, setEditableItems] = useState({});
 
   const handleItemChange = (itemId, field, value) => {
+    const updatedItem = {
+      ...editableItems[itemId],
+      [field]: value,
+    };
+
     setEditableItems((prev) => ({
       ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        [field]: value,
-      },
+      [itemId]: updatedItem,
     }));
+
+    const item = cartItems.find((it) => it.psitmcno === itemId);
+    if (item) {
+      const newItem = {
+        ...item,
+        ...updatedItem,
+      };
+      handleUpdateItem(itemId, newItem);
+    }
   };
 
-  const handleUpdateItem = async (itemId, item) => {
-    const changes = editableItems[itemId];
-    if (!changes) return;
+  // const handleUpdateItem = async (itemId, item) => {
+  //   const changes = editableItems[itemId];
+  //   if (!changes) return;
 
+  //   const payload = {
+  //     psmbrcar: item.psmbrcar,
+  //     psitmcno: itemId,
+  //     psmrcuid: merchantid,
+  //     psprduid: item.psprduid,
+  //     psitmqty: changes.psitmqty || item.psitmqty,
+  //     psitmrmk:
+  //       changes.psitmrmk !== undefined ? changes.psitmrmk : item.psitmrmk,
+  //   };
+
+  //   try {
+  //     await cartAPI.updateCartItem(payload); // assuming wrapper function
+  //     fetchCartItem(); // refresh data
+  //   } catch (err) {
+  //     console.error("Update failed", err);
+  //     showAlert("Update Failed", "Could not update the item.");
+  //   }
+  // };
+  const handleUpdateItem = async (itemId, item) => {
     const payload = {
       psmbrcar: item.psmbrcar,
       psitmcno: itemId,
       psmrcuid: merchantid,
       psprduid: item.psprduid,
-      psitmqty: changes.psitmqty || item.psitmqty,
-      psitmrmk:
-        changes.psitmrmk !== undefined ? changes.psitmrmk : item.psitmrmk,
+      psitmqty: item.psitmqty,
+      psitmrmk: item.psitmrmk,
     };
 
     try {
-      await cartAPI.updateCartItem(payload); // assuming wrapper function
-      fetchCartItem(); // refresh data
+      await cartAPI.updateCartItem(payload);
+      fetchCartItem();
     } catch (err) {
       console.error("Update failed", err);
       showAlert("Update Failed", "Could not update the item.");
@@ -355,20 +384,15 @@ const CartDetail = () => {
                   />
                 </View>
               </View>
-              <View>
+              <View style={{ justifyContent: "space-between" }}>
                 <Text style={cartStyles.subtotal}>RM {item.psitmsbt}</Text>
+                <TouchableOpacity
+                  onPress={() => handleRemoveItem(item.id)}
+                  style={{ alignSelf: "flex-end" }}
+                >
+                  <MaterialIcons name="delete" size={24} color="red" />
+                </TouchableOpacity>
               </View>
-            </View>
-
-            <View style={cartStyles.iconRow}>
-              <TouchableOpacity
-                onPress={() => handleUpdateItem(item.psitmcno, item)}
-              >
-                <Feather name="check-circle" size={24} color="green" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
-                <MaterialIcons name="delete" size={24} color="red" />
-              </TouchableOpacity>
             </View>
 
             <View style={cartStyles.separator} />
