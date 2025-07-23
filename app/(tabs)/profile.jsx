@@ -1,6 +1,7 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -27,11 +28,13 @@ const ProfileScreen = () => {
     setMember(member);
   };
 
-  useEffect(() => {
-    if (!isLoadingAuth && isLoggedIn) {
-      fetchMember();
-    }
-  }, [isLoadingAuth, isLoggedIn]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!isLoadingAuth && isLoggedIn) {
+        fetchMember();
+      }
+    }, [isLoadingAuth, isLoggedIn])
+  );
 
   const handleSettingPress = (item) => {
     switch (item) {
@@ -77,7 +80,7 @@ const ProfileScreen = () => {
             <TouchableOpacity onPress={() => router.push("/(auth)/sign-in")}>
               <Text style={profileStyles.nameText}>
                 <Text style={profileStyles.boldText}>Sign In </Text>
-                 to view your profile.
+                to view your profile.
               </Text>
             </TouchableOpacity>
           </View>

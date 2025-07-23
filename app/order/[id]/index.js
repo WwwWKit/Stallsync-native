@@ -31,7 +31,7 @@ const OrderDetail = () => {
 
   const [order, setOrder] = useState({});
   const [orderItems, setOrderItems] = useState([]);
-  const [gtotal, setGtotal] = useState(0);
+ 
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -73,11 +73,6 @@ const OrderDetail = () => {
     }
   }, [id]);
 
-  useEffect(() => {
-    if (Object.keys(order).length > 0) {
-      calculate();
-    }
-  }, [order]);
 
   if (loading) {
     return (
@@ -87,13 +82,7 @@ const OrderDetail = () => {
     );
   }
 
-  const calculate = () => {
-    if (!order.psordamt || !order.psordsst) return;
-    const gtotal = (
-      parseFloat(order.psordamt) + parseFloat(order.psordsst)
-    ).toFixed(2);
-    setGtotal(gtotal);
-  };
+ 
 
   const fetchReview = async () => {
     try {
@@ -104,7 +93,6 @@ const OrderDetail = () => {
       } else {
         router.push(`/review/${id}`);
       }
-      
     } catch (e) {
       console.log("Failed to find review:", e);
     }
@@ -113,7 +101,9 @@ const OrderDetail = () => {
   const handleOnlineCheckout = async () => {
     setLoading(true); // show spinner
     try {
-      const trxRes = await transactionAPI.createOnline(id, gtotal, {
+      const amt = order.psordgra;
+      
+      const trxRes = await transactionAPI.createOnline(id, amt, {
         returnUrl: getReturnUrl(),
       });
       if (!trxRes?.url) throw new Error("Payment session error");
@@ -164,16 +154,24 @@ const OrderDetail = () => {
       <View style={cartStyles.contentContainer}>
         <View style={cartStyles.rowContainer3}>
           <Text style={cartStyles.total}>Subtotal :</Text>
-          <Text style={cartStyles.total}>{order.psordamt}</Text>
+          <Text style={cartStyles.total}>RM {order.psordamt}</Text>
+        </View>
+        <View style={cartStyles.rowContainer3}>
+          <Text style={cartStyles.total}>Points Disc :</Text>
+          <Text style={cartStyles.total}>- RM {order.psordpdv}</Text>
+        </View>
+        <View style={cartStyles.rowContainer3}>
+          <Text style={cartStyles.total}>Reward Disc :</Text>
+          <Text style={cartStyles.total}>- RM {order.psordrdv}</Text>
         </View>
         <View style={cartStyles.rowContainer3}>
           <Text style={cartStyles.total}>SST (6%) :</Text>
-          <Text style={cartStyles.total}>{order.psordsst}</Text>
+          <Text style={cartStyles.total}>RM {order.psordsst}</Text>
         </View>
         <View style={cartStyles.separator}></View>
         <View style={cartStyles.spacebetween}>
           <Text style={cartStyles.gtotal}>TOTAL :</Text>
-          <Text style={cartStyles.gtotal}>{gtotal}</Text>
+          <Text style={cartStyles.gtotal}>RM {order.psordgra}</Text>
         </View>
         <View style={{ height: 100 }} />
       </View>

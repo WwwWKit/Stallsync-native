@@ -4,18 +4,18 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { createOrderStyles } from "../../../assets/styles/order.styles";
 import { Colors } from "../../../constants/colors";
 import { useColorScheme } from "../../../hooks/useColorScheme";
 import { reviewAPI } from "../../../services/backendAPIs";
+import { showAlert } from "../../../utils/common";
 
 const ReviewPage = () => {
   const { id } = useLocalSearchParams();
@@ -53,7 +53,7 @@ const ReviewPage = () => {
         }
       } catch (err) {
         console.error("Error loading review:", err);
-        Alert.alert("Error", "Failed to load review.");
+        showAlert("Error", "Failed to load review.");
       } finally {
         setLoading(false);
       }
@@ -64,7 +64,7 @@ const ReviewPage = () => {
 
   const handleSave = async () => {
     if (!rating || isNaN(rating)) {
-      Alert.alert("Invalid", "Rating must be a number");
+      showAlert("Invalid", "Rating must be a number");
       return;
     }
 
@@ -79,10 +79,10 @@ const ReviewPage = () => {
       };
 
       await reviewAPI.updateReview(payload);
-      Alert.alert("Success", "Review updated successfully.");
+      showAlert("Success, Review updated successfully.");
     } catch (err) {
       console.error("Error updating review:", err);
-      Alert.alert("Error", "Failed to update review.");
+      showAlert("Error", "Failed to update review.");
     }
   };
 

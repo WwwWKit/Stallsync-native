@@ -11,8 +11,9 @@ export const createCategoryStyles = (theme = "light") => {
       backgroundColor: color.primary,
     },
     categoryFilterContainer: {
-
-      paddingVertical: 16,
+      borderBottomWidth: 2,
+      borderColor: color.border,
+      paddingVertical: 20,
       backgroundColor: color.background,
     },
     categoryFilterScrollContent: {

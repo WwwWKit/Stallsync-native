@@ -264,7 +264,10 @@ const CartDetail = () => {
     try {
       const ordId = await createOrder();
       if (!ordId) throw new Error("Order creation failed");
-      const trxRes = await transactionAPI.createOnline(ordId.ordId, ordId.amt, {
+      let id = ordId.ordId;
+      let amt = ordId.amt;
+
+      const trxRes = await transactionAPI.createOnline(id, amt, {
         returnUrl: getReturnUrl(),
       });
       if (!trxRes?.url) throw new Error("Transaction failed");
@@ -514,14 +517,17 @@ const CartDetail = () => {
           >
             <Text style={cartStyles.modalText}>Pay at Counter</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setModalVisible(false);
-              handleOnlineCheckout();
-            }}
-          >
-            <Text style={cartStyles.modalText}>Online Payment</Text>
-          </TouchableOpacity>
+          {parseFloat(total) > 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(false);
+                handleOnlineCheckout();
+              }}
+            >
+              <Text style={cartStyles.modalText}>Online Payment</Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity onPress={() => setModalVisible(false)}>
             <Text style={[cartStyles.modalText, cartStyles.modalCancel]}>
               Cancel
