@@ -9,7 +9,7 @@ export const setAuthToken = (token) => {
 };
 
 const api = axios.create({
-  baseURL: "http://localhost:5040/api",
+  baseURL: "http://localhost:3000/api",
   //baseURL: "http://192.168.56.1:5040/api",
   timeout: 10000,
   headers: {

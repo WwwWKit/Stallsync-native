@@ -5,16 +5,16 @@ import { useAuth } from "../../constants/AuthContext"; // assumes your context i
 import { Colors } from "../../constants/colors";
 
 const AuthLayout = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isAuthChecking } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (!isAuthChecking && isLoggedIn) {
       router.replace("/"); 
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isAuthChecking]);
 
   return (
     <Stack

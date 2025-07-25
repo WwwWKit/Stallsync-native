@@ -18,7 +18,6 @@ export const merchantAPI = {
       const res = await api.get("/psmrcpar/detail", {
         params: { id },
       });
-      // 如果props中有当前主题的颜色，则返回该颜色
       return res.data.message;
     } catch (err) {
       console.log("Error in get merchant:", err);
@@ -188,18 +187,19 @@ export const cartAPI = {
     }
   },
 
-
   deleteCartItem: async (id) => {
-  try {
-    const res = await api.post('/psmbrcrt/delete', id);
+    try {
+      const res = await api.post("/psmbrcrt/delete", id);
 
-    return res.data;
-  } catch (error) {
-    console.error('Delete Cart Error:', error.response?.data || error.message);
-    return { success: false, error: error.response?.data };
-  }},
-  
-
+      return res.data;
+    } catch (error) {
+      console.error(
+        "Delete Cart Error:",
+        error.response?.data || error.message
+      );
+      return { success: false, error: error.response?.data };
+    }
+  },
 
   listMerchant: async () => {
     try {
@@ -262,7 +262,9 @@ export const orderAPI = {
 export const reviewAPI = {
   listReviews: async (id, { page = 0, limit = 10 } = {}) => {
     try {
-      const res = await api.get(`/psordrvw/list_m`, { params: { id, page, limit } });
+      const res = await api.get(`/psordrvw/list_m`, {
+        params: { id, page, limit },
+      });
       return res.data.message || [];
     } catch (err) {
       console.log("Error in list reviews:", err);
@@ -291,12 +293,11 @@ export const reviewAPI = {
     }
   },
 
-   updateReview: async (data) => {
+  updateReview: async (data) => {
     const res = await api.post(`/psordrvw/update`, data);
     console.log("Review updated:", res.data);
     return res.data;
   },
- 
 };
 
 export const transactionAPI = {
@@ -354,7 +355,7 @@ export const userAPI = {
 
   deleteUser: async (id) => {
     try {
-      const res = await api.post(`/psusrprf/rollback`, {id: id});
+      const res = await api.post(`/psusrprf/rollback`, { id: id });
       return res.data;
     } catch (err) {
       console.error("Failed to delete user:", err);
@@ -367,7 +368,7 @@ export const userAPI = {
       const res = await api.post(`/psusrprf/change_password`, {
         password: oldPassword,
         newpassword: newPassword,
-        conpassword: conPassword
+        conpassword: conPassword,
       });
       return res.data;
     } catch (err) {
@@ -375,7 +376,7 @@ export const userAPI = {
       return { error: true };
     }
   },
-  
+
   forgetPassword: async (email) => {
     try {
       const res = await api.post(`/psusrprf/reset`, email);
@@ -387,14 +388,29 @@ export const userAPI = {
   },
 
   getUserByUsername: async (username) => {
-  try {
-    const res = await api.post(`/psusrprf/checkUsername`, { username });
-    return res.data.message;
-  } catch (err) {
-    console.error("Username check failed:", err);
-    return { exists: false };
-  }
-},
+    try {
+      const res = await api.post(`/psusrprf/checkUsername`, { username });
+      return res.data.message;
+    } catch (err) {
+      console.error("Username check failed:", err);
+      return { exists: false };
+    }
+  },
+
+  verifyAuth: async (token) => {
+    try {
+      const res = await api.get(`/psusrprf/verify`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Auth verified:", res.data);
+      return res.data;
+    } catch (e) {
+      console.error("Failed to verify auth token:", e);
+      return { ok: false };
+    }
+  },
 };
 
 export const memberAPI = {
@@ -443,16 +459,14 @@ export const rewardAPI = {
   rewardddl: async (merchantid) => {
     try {
       const res = await api.get(`/ddl/reward`, {
-        params: {psmrcuid: merchantid}
-      } );
+        params: { psmrcuid: merchantid },
+      });
       return res.data?.message?.data || [];
     } catch (err) {
       console.log("Error in list voucher:", err);
       return [];
     }
-
   },
-
 };
 
 export const uploadAPI = {
